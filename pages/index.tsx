@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Navbar from '../components/layout/Navbar';
 import Hero from '../components/home/Hero';
 import Motivation from '../components/home/Motivation';
-import Blog from '../components/home/Blog';
+
 import Footer from '../components/layout/Footer';
 
 const Home: NextPage = () => {
@@ -21,7 +21,6 @@ const Home: NextPage = () => {
         <Hero />
         <Motivation />
       </div>
-      <Blog />
       <Footer />
     </>
   );
