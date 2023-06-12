@@ -10,12 +10,13 @@ module.exports = {
       },
       colors: {
         primary: {
-          'dark-blue': 'hsl(233, 26%, 24%)',
+          'dark-blue': 'hsl(204, 74%, 46%)',
           'lime-green': 'hsl(136, 65%, 51%)',
-          'bright-cyan': 'hsl(192, 70%, 51%)',
+          'bright-cyan': 'hsl(197, 98%, 60%)',
+          black: 'hsl(0, 0%, 0%)',
         },
         neutral: {
-          'grayish-blue': 'hsl(233, 8%, 62%)',
+          'grayish-blue': '#0066cc',
           'light-grayish-blue': 'hsl(220, 16%, 96%)',
           'very-light-gray': 'hsl(0, 0%, 98%)',
           white: 'hsl(0, 0%, 100%)',

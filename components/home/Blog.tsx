@@ -37,7 +37,7 @@ export default function Blog() {
   return (
     <section className="py-14 lg:py-24">
       <div className="container">
-        <h2 className="text-center text-3xl lg:text-4xl text-primary-dark-blue mb-5 lg:text-left lg:mb-10">
+        <h2 className="text-center text-3xl lg:text-4xl text-primary-black mb-5 lg:text-left lg:mb-10">
           Latest Articles
         </h2>
         <div className="grid grid-cols-1 gap-5 lg:gap-7 lg:grid-cols-4">
@@ -55,7 +55,7 @@ export default function Blog() {
                 <span className="text-neutral-grayish-blue text-xs">
                   {article.author}
                 </span>
-                <h4 className="text-primary-dark-blue text-sm py-2 hover:text-green-400">
+                <h4 className="text-primary-black text-sm py-2 hover:text-green-400">
                   <a href="#">{article.title}</a>
                 </h4>
                 <p className="text-neutral-grayish-blue text-xs">
