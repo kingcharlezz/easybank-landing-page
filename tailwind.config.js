@@ -9,6 +9,9 @@ module.exports = {
         sans: ['Public Sans', ...defaultTheme.fontFamily.sans],
       },
       colors: {
+        'darker-blue': '#343541',
+        'darkish-grey' : '#444654',
+        'dark-gray': '#202123',
         primary: {
           'dark-blue': 'hsl(204, 74%, 46%)',
           'lime-green': 'hsl(136, 65%, 51%)',
