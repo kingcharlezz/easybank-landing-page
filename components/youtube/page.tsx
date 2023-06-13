@@ -289,9 +289,8 @@ export default function Example() {
   }, []);
 
   return (
-    <div className="flex flex-row">
-      <div className="w-1/2">
-        {started ? <Youtube url={url} ts={ts} /> : null}
+    <div className="flex flex-row-reverse">
+      <div className="w-2/3">
         {started && summary && summary.length > 0 ? (
           <>
             <Divider summary={summary} url={url} shortenFn={generateShorten} />
@@ -311,8 +310,15 @@ export default function Example() {
         ) : null}
       </div>
       
-      <div className="w-1/2">
+      <div className="w-1/3">
+        {started ? <Youtube url={url} ts={ts} /> : null}
         <ToastContainer />
+        <h1 className="mt-12 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
+          NoteScribe
+        </h1>
+        <p className="mt-6 text-lg leading-8 text-gray-600">
+          Meet NoteScribe, an AI-powered platform...
+        </p>
         <div className="mt-10 flex flex-col items-center gap-y-6">
           <div className="relative">
             <label htmlFor="url" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">
