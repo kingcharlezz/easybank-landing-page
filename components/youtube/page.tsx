@@ -289,29 +289,8 @@ export default function Example() {
   }, []);
 
   return (
-    <div className="flex flex-row-reverse">
-      <div className="w-2/3">
-        {started && summary && summary.length > 0 ? (
-          <>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-            <article className="prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0">
-              <ReactMarkdown
-                components={{
-                  a: LinkRenderer,
-                }}
-              >
-                {"> Heres a tip! Click the # to jump to the timestamp.\n" +
-                  summary +
-                  "\n"}
-              </ReactMarkdown>
-            </article>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-          </>
-        ) : null}
-      </div>
-      
-      <div className="w-1/3">
-        {started ? <Youtube url={url} ts={ts} /> : null}
+    <div className="flex flex-row">
+      <div className="w-1/2">
         <ToastContainer />
         <h1 className="mt-12 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
           NoteScribe
@@ -355,6 +334,27 @@ export default function Example() {
             Go!
           </button>
         </div>
+      </div>
+
+      <div className="w-1/2">
+        {started ? <Youtube url={url} ts={ts} /> : null}
+        {started && summary && summary.length > 0 ? (
+          <>
+            <Divider summary={summary} url={url} shortenFn={generateShorten} />
+            <article className="prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0">
+              <ReactMarkdown
+                components={{
+                  a: LinkRenderer,
+                }}
+              >
+                {"> Heres a tip! Click the # to jump to the timestamp.\n" +
+                  summary +
+                  "\n"}
+              </ReactMarkdown>
+            </article>
+            <Divider summary={summary} url={url} shortenFn={generateShorten} />
+          </>
+        ) : null}
       </div>
     </div>
   );
