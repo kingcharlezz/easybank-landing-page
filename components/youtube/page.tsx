@@ -289,73 +289,78 @@ export default function Example() {
   }, []);
 
   return (
-    <div className="flex flex-row">
-      <div className="w-1/2">
-        <ToastContainer />
-        <h1 className="mt-12 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
-          NoteScribe
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
-          Meet NoteScribe, an AI-powered platform...
-        </p>
-        <div className="mt-10 flex flex-col items-center gap-y-6">
-          <div className="relative">
-            <label htmlFor="url" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">
-              Youtube Link
-            </label>
-            <input
-              type="text"
-              name="url"
-              id="url"
-              ref={urlRef}
-              size={40}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base"
-              placeholder="https://www.youtube.com/watch?v=1234567890"
-            />
+    <>
+      <ToastContainer />
+      <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
+        <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-7 lg:px-0 lg:pt-20 lg:pb-56 xl:col-span-6">
+          <div className="max-w-2xl lg:mx-0">
+            <h1 className="mt-12 text-4xl font-bold tracking-tight text-gray-900 sm:mt-10 sm:text-6xl">
+              NoteScribe
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              Meet NoteScribe, an AI-powered platform that revolutionizes learning by converting uploaded files and YouTube videos into comprehensive notes, making the need to physically attend classes a thing of the past. With NoteScribe, students can enjoy an enriched, flexible learning journey right from the comfort of their home, breaking away from traditional classroom constraints.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-y-6">
+              <div className="relative">
+                <label htmlFor="url" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">
+                  Youtube Link
+                </label>
+                <input
+                  type="text"
+                  name="url"
+                  id="url"
+                  ref={urlRef}
+                  size={40}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base"
+                  placeholder="https://www.youtube.com/watch?v=1234567890"
+                />
+              </div>
+              <div className="relative">
+                <label htmlFor="file" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">
+                  Upload File
+                </label>
+                <input
+                  type="file"
+                  name="file"
+                  id="file"
+                  ref={fileRef}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base"
+                />
+              </div>
+              <button
+                onClick={handleProcessing}
+                disabled={loading}
+                type="button"
+                className="rounded-md bg-blue-600 py-2 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-80"
+              >
+                Go!
+              </button>
+            </div>
           </div>
-          <div className="relative">
-            <label htmlFor="file" className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">
-              Upload File
-            </label>
-            <input
-              type="file"
-              name="file"
-              id="file"
-              ref={fileRef}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base"
-            />
-          </div>
-          <button
-            onClick={handleProcessing}
-            disabled={loading}
-            type="button"
-            className="rounded-md bg-blue-600 py-2 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-80"
-          >
-            Go!
-          </button>
+        </div>
+
+        <div className="relative lg:col-span-5 lg:-mr-8 my-auto">
+          {started ? <Youtube url={url} ts={ts} /> : null}
         </div>
       </div>
 
-      <div className="w-1/2">
-        {started ? <Youtube url={url} ts={ts} /> : null}
-        {started && summary && summary.length > 0 ? (
-          <>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-            <article className="prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0">
-              <ReactMarkdown
-                components={{
-                  a: LinkRenderer,
-                }}
-              >
-                {"> Heres a tip! Click the # to jump to the timestamp.\n" +
-                  summary +
-                  "\n"}
-              </ReactMarkdown>
-            </article>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-          </>
-        ) : null}
-      </div>
-    </div>
+      {started && summary && summary.length > 0 ? (
+        <>
+          <Divider summary={summary} url={url} shortenFn={generateShorten} />
+          <article className="prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0">
+            <ReactMarkdown
+              components={{
+                a: LinkRenderer,
+              }}
+            >
+              {"> Heres a tip! Click the # to jump to the timestamp.\n" +
+                summary +
+                "\n"}
+            </ReactMarkdown>
+          </article>
+          <Divider summary={summary} url={url} shortenFn={generateShorten} />
+        </>
+      ) : null}
+    </>
   );
-};
+}
