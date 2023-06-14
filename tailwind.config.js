@@ -1,8 +1,13 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
-  purge: ['./components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
-  darkMode: false,
+  purge: [
+    './components/**/*.{js,ts,jsx,tsx}', 
+    './pages/**/*.{js,ts,jsx,tsx}', 
+    // From file 2
+    './src/**/*.{js,ts,jsx,tsx}'
+  ],
+  darkMode: false, 
   theme: {
     extend: {
       fontFamily: {
@@ -52,5 +57,10 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/aspect-ratio')],
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+    // From file 2
+    require('@tailwindcss/typography'), 
+    require('@tailwindcss/forms')
+  ],
 };
