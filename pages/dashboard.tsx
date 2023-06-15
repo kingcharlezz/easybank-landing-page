@@ -31,7 +31,7 @@ export default function Dashboard({ children }: DashboardProps) {
       case 'profile':
         return <h1 className="text-primary-bright-cyan">Profile content</h1>;
       case 'noteTaking':
-        return <Example />; // Add your component or content for the note taking view here
+        return <Example darkMode={darkMode} />; // Add your component or content for the note taking view here
       default:
         return <h1>Overview content</h1>;
     }
@@ -44,6 +44,11 @@ export default function Dashboard({ children }: DashboardProps) {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   
   const toggleDarkMode = () => {
+    if (!darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
     setDarkMode(!darkMode);
   };
   
