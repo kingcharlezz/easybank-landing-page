@@ -27,12 +27,12 @@ export default function Divider({
     : '-ml-1 -mr-0.5 h-5 w-5 text-primary-black';
 
   return (
-    <div className={`relative py-10 ${darkMode ? 'bg-dark-900' : 'bg-white'}`}>
+    <div className={`relative ${darkMode ? 'bg-dark-900' : 'bg-white'}`}>
       <div className={`absolute inset-0 flex items-center ${darkMode ? 'border-gray-600' : 'border-gray-300'}`} aria-hidden="true" style={{zIndex: 1}}>
         <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'}`} />
       </div>
       <div className="relative flex justify-center" style={{zIndex: 10}}>
-        <div className={`inline-flex space-x-5 bg-transparent`}>
+        <div className={`inline-flex space-x-5 ${darkMode ? 'bg-dark-900' : 'bg-white'}`}>
           {summaryClean.length > 0 ? (
             <button
               type="button"

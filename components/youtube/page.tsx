@@ -296,7 +296,7 @@ export default function Example({ darkMode }: ExampleProps) {
     <>
       <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>
         <ToastContainer />
-        <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
+        <div className="lg:grid lg:grid-cols-12">
           <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-7 lg:px-0 lg:pt-20 lg:pb-56 xl:col-span-6">
             <div className="max-w-2xl lg:mx-0">
               <h1 className={`mt-12 text-4xl font-bold tracking-tight ${darkMode ? 'text-neutral-white' : 'text-gray-900'} sm:mt-10 sm:text-6xl`}>
@@ -352,9 +352,9 @@ export default function Example({ darkMode }: ExampleProps) {
         {started && summary && summary.length > 0 ? (
           <>
             <Divider summary={summary} url={url} shortenFn={generateShorten} darkMode={darkMode} />
-            <article className={`prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0 ${darkMode ? 'text-neutral-white bg-darker-blue' : 'text-primary-black bg-white'}`}>
-            <div className="parent-component" style={{display: 'outside', justifyContent: 'center'}}>
-                <div className="summary-output" style={{maxWidth: '200%', textAlign: 'justify'}}>
+            <article className={`prose prose-red w-full border-red-100 mx-auto lg:px-0 ${darkMode ? 'text-neutral-white bg-darker-blue' : 'text-primary-black bg-white'}`}>
+            <div className="parent-component" style={{display: 'flex', justifyContent: 'center', }}>
+                <div className="summary-output" style={{textAlign: 'justify'}}>
               <ReactMarkdown
                 components={{
                   a: LinkRenderer,

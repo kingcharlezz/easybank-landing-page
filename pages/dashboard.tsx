@@ -53,7 +53,7 @@ export default function Dashboard({ children }: DashboardProps) {
   
   return (
     <div className={`${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'} h-screen flex`}>
-        <aside className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} shadow w-64 min-h-screen p-6 fixed top-0`}>
+      <aside className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} shadow w-64 min-h-screen p-6 fixed top-0 left-180`}>
         <h1 className={`${darkMode ? 'text-neutral-white' : 'text-primary-black'} text-2xl font-sans font-bold mb-6`}>Your Dashboard</h1>
         <nav>
           <a 
@@ -82,8 +82,8 @@ export default function Dashboard({ children }: DashboardProps) {
               onClick={toggleDarkMode} 
               className={`mr-2 ${darkMode ? 'bg-darker-blue text-neutral-white border-neutral-white' : 'bg-darker-blue text-neutral-white border-primary-black'} rounded-md px-4 py-2`}
             >
-            {darkMode ? 'Light Mode' : 'Dark Mode'}
-          </button>
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
             <button className="bg-darker-blue text-white border-primary-black border-2 rounded-md px-4 py-2">
               Logout
             </button>
