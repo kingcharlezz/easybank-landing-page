@@ -4,7 +4,6 @@ import Example from '../components/youtube/page';
 import { UserContext } from './_app';
 import { getAuth, signOut } from 'firebase/auth';
 import { FaUsers, FaDollarSign, FaBoxOpen, FaShoppingCart } from 'react-icons/fa';
-import ReactMarkdown from "react-markdown";
 
 interface DashboardProps {
   children?: ReactNode;
@@ -53,8 +52,8 @@ export default function Dashboard({ children }: DashboardProps) {
   };
   
   return (
-    <div className={`${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'} min-h-screen flex`}>
-      <aside className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} shadow w-64 min-h-screen p-6`}>
+    <div className={`${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'} h-screen flex`}>
+        <aside className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} shadow w-64 min-h-screen p-6 fixed top-0`}>
         <h1 className={`${darkMode ? 'text-neutral-white' : 'text-primary-black'} text-2xl font-sans font-bold mb-6`}>Your Dashboard</h1>
         <nav>
           <a 
@@ -75,9 +74,9 @@ export default function Dashboard({ children }: DashboardProps) {
           </a>
         </nav>
       </aside>
-      <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} flex-grow mx-auto py-10 px-6`}>
+      <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} flex-grow mx-auto py-10 px-6 ml-64`}>
         <header className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} flex items-center justify-between p-5 rounded-md mb-10`}>
-          <h2 className="text-3xl font-sans font-bold">Welcome back!</h2>
+          <h2 className="text-3xl font-sans font-bold">!</h2>
           <div className="flex items-center justify-end">
             <button 
               onClick={toggleDarkMode} 

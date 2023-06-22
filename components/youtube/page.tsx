@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
@@ -294,7 +294,7 @@ export default function Example({ darkMode }: ExampleProps) {
   }, []);
   return (
     <>
-      <div className={darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'}>
+      <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>
         <ToastContainer />
         <div className="mx-auto max-w-7xl lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
           <div className="px-6 pt-10 pb-24 sm:pb-32 lg:col-span-7 lg:px-0 lg:pt-20 lg:pb-56 xl:col-span-6">
@@ -316,12 +316,12 @@ export default function Example({ darkMode }: ExampleProps) {
                     id="url"
                     ref={urlRef}
                     size={40}
-                    className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-neutral-white' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
+                    className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-gray-900' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
                     placeholder="https://www.youtube.com/watch?v=1234567890"
                   />
                 </div>
                 <div className="relative">
-                  <label htmlFor="file" className={`absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium ${darkMode ? 'text-neutral-white' : 'text-gray-900'}`}>
+                  <label htmlFor="file" className={`absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium ${darkMode ? 'text-gray-900' : 'text-gray-900'}`}>
                     Upload File
                   </label>
                   <input
@@ -351,21 +351,29 @@ export default function Example({ darkMode }: ExampleProps) {
   
         {started && summary && summary.length > 0 ? (
           <>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-            <article className={`prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0 ${darkMode ? 'text-neutral-white' : 'text-primary-black'}`}>
+            <Divider summary={summary} url={url} shortenFn={generateShorten} darkMode={darkMode} />
+            <article className={`prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0 ${darkMode ? 'text-neutral-white bg-darker-blue' : 'text-primary-black bg-white'}`}>
+            <div className="parent-component" style={{display: 'outside', justifyContent: 'center'}}>
+                <div className="summary-output" style={{maxWidth: '200%', textAlign: 'justify'}}>
               <ReactMarkdown
                 components={{
                   a: LinkRenderer,
+                  h1: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
+                  h2: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
+                  h3: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />, 
+                  p: ({ node, ...props }) => <p {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
                 }}
               >
                 {"> Heres a tip! Click the # to jump to the timestamp.\n" +
                   summary +
                   "\n"}
               </ReactMarkdown>
+              </div>
+            </div>
             </article>
-            <Divider summary={summary} url={url} shortenFn={generateShorten} />
-          </>
-        ) : null}
+            <Divider summary={summary} url={url} shortenFn={generateShorten} darkMode={darkMode} />
+          </>)
+          : null}
       </div>
     </>
   );
