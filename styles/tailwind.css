@@ -188,9 +188,6 @@ button,
 [type='submit'] {
 	appearance: button;
 
-	/* 1 */
-	background-color: transparent;
-
 	/* 2 */
 	background-image: none;
 
@@ -2526,8 +2523,7 @@ button,
 [type='submit'] {
 	appearance: button;
 
-	/* 1 */
-	background-color: transparent;
+
 
 	/* 2 */
 	background-image: none;
