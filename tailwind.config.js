@@ -7,7 +7,7 @@ module.exports = {
     // From file 2
     './src/**/*.{js,ts,jsx,tsx}'
   ],
-  darkMode: 'class', 
+  darkMode: false, 
   theme: {
     extend: {
       fontFamily: {
