@@ -32,7 +32,7 @@ export default function Divider({
         <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'}`} />
       </div>
       <div className="relative flex justify-center" style={{zIndex: 10}}>
-        <div className={`inline-flex space-x-5 ${darkMode ? 'bg-dark-900' : 'bg-white'}`}>
+      <div className={`inline-flex space-x-5 ${darkMode ? 'bg-dark-900' : 'bg-transparent'}`}>
           {summaryClean.length > 0 ? (
             <button
               type="button"
