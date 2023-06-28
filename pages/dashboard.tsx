@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
 import Example from '../components/youtube/page';
+import TextAnalyzerPage from '../components/humanizer/page';
 import { UserContext } from './_app';
 import { getAuth, signOut } from 'firebase/auth';
 import { FaUsers, FaDollarSign, FaBoxOpen, FaShoppingCart } from 'react-icons/fa';
@@ -29,12 +30,10 @@ export default function Dashboard({ children }: DashboardProps) {
         return <h1 className="text-primary-dark-blue">Overview content</h1>;
       case 'settings':
         return <h1 className="text-primary-lime-green">Settings content</h1>;
-      case 'profile':
-        return <h1 className="text-primary-bright-cyan">Profile content</h1>;
+      case 'humanizer':
+        return <TextAnalyzerPage/>;
       case 'noteTaking':
         return <Example darkMode={darkMode} />; // Add your component or content for the note taking view here
-      default:
-        return <h1>Overview content</h1>;
     }
   };
 
@@ -70,8 +69,12 @@ export default function Dashboard({ children }: DashboardProps) {
           >
             <FaUsers className="mr-2" /> Automated Note-Taking
           </a>
-          <a href="#" className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}>
-            <FaDollarSign className="mr-2" /> Sales
+          <a
+            href="#"
+            onClick={() => setView('humanizer')}
+            className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}
+          >
+            <FaDollarSign className="mr-2" /> Essay Humanizer
           </a>
           <a href="#" className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}>
             <FaBoxOpen className="mr-2" /> Products
