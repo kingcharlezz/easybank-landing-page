@@ -15,16 +15,32 @@ import {
 type ExampleProps = {
   darkMode: boolean;
 };
+import { extractVideoId } from "./utils";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import 'firebase/auth';
+
+
 
 export default function Example({ darkMode }: ExampleProps) {
   const [started, setStart] = useState(false);
   const [url, setUrl] = useState("");
   const urlRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [uid, setUid] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
   const [ts, setTs] = useState(0);
+
+  const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    setUid(user.uid);
+    console.log(uid); 
+  } else {
+    console.log("No user is signed in.");
+  }
+});
 
   function LinkRenderer(props: any) {
     const href = props.href;
@@ -74,6 +90,28 @@ export default function Example({ darkMode }: ExampleProps) {
     setLoading(true);
     setUrl(currentUrl);
 
+    try {
+      const videoId = extractVideoId(currentUrl);
+      const responseVideoID = await fetch("/api/saveVideoID", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoId: videoId,
+          uid: uid,
+        }),
+      });
+
+      if (!responseVideoID.ok) {
+        toast.error("Error saving video id.");
+        setLoading(false);
+        throw new Error(responseVideoID.statusText);
+      }
+    } catch (err) {
+      console.log("Error while saving VideoID: ", err);
+    }
+    
     const response = await fetch("/api/summary", {
       method: "POST",
       headers: {
@@ -155,7 +193,7 @@ export default function Example({ darkMode }: ExampleProps) {
     });
   
     if (!response.ok) {
-      const errorMessage = `Error generating summary: ${response.statusText}`;
+      const errorMessage = `Error generating transcript: ${response.statusText}`;
       toast.error(errorMessage);
       setLoading(false);
       throw new Error(errorMessage);
@@ -293,7 +331,7 @@ export default function Example({ darkMode }: ExampleProps) {
     }
   }, []);
   return (
-    <>
+    <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
       <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>
         <ToastContainer />
         <div className="mx-auto lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">
@@ -343,12 +381,10 @@ export default function Example({ darkMode }: ExampleProps) {
               </div>
             </div>
           </div>
-  
           <div className="relative lg:col-span-5 lg:-mr-8 my-auto">
-            {started ? <Youtube url={url} ts={ts} /> : null}
-          </div>
+          {started ? <Youtube url={url} ts={ts} /> : null}
         </div>
-  
+        </div>
         {started && summary && summary.length > 0 ? (
           <>
             <Divider summary={summary} url={url} shortenFn={generateShorten} darkMode={darkMode} />
@@ -375,6 +411,6 @@ export default function Example({ darkMode }: ExampleProps) {
           </>)
           : null}
       </div>
-    </>
+  </div>
   );
 };

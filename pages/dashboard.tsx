@@ -85,7 +85,7 @@ export default function Dashboard({ children }: DashboardProps) {
         </nav>
       </aside>
       <div style={{ marginLeft: '16rem' }}> {/* Use style prop to add margin-left */}
-        <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} w-[calc(100%-16rem)] py-10 px-6 flex flex-col`}>
+        <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} w-[calc(100%-16rem)] py-10 px-6 flex flex-col flex-grow`}>
           <header className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} flex items-center justify-between p-5 rounded-md mb-10`}>
             <h2 className="text-3xl font-sans font-bold">Welcome back!</h2>
             <div className="flex items-center justify-end">

@@ -2,9 +2,12 @@ import {
   ArrowUpOnSquareIcon,
   ClipboardDocumentIcon,
   ClipboardDocumentListIcon,
+  PrinterIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import { parseChaptersFromSummary, extractVideoId } from "../utils";
+import ReactToPrint from 'react-to-print';
+import { useRef } from 'react';
 
 export default function Divider({
   summary,
@@ -18,6 +21,7 @@ export default function Divider({
   darkMode: boolean;
 }): JSX.Element {
   let summaryClean = summary;
+  const componentRef = useRef<HTMLDivElement>(null);
 
   let buttonClass = darkMode
     ? 'bg-dark-gray inline-flex items-center gap-x-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-neutral-white shadow-sm ring-1 ring-inset ring-gray-300'
@@ -32,7 +36,7 @@ export default function Divider({
         <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'}`} />
       </div>
       <div className="relative flex justify-center" style={{zIndex: 10}}>
-      <div className={`inline-flex space-x-5 ${darkMode ? 'bg-dark-900' : 'bg-transparent'}`}>
+        <div ref={componentRef} className={`inline-flex space-x-5 ${darkMode ? 'bg-dark-900' : 'bg-transparent'}`}>
           {summaryClean.length > 0 ? (
             <button
               type="button"
@@ -118,6 +122,22 @@ export default function Divider({
             />
             Share
           </button>
+          <ReactToPrint
+            trigger={() => (
+              <button
+                type="button"
+                title="Print summary"
+                className={buttonClass}
+              >
+                <PrinterIcon
+                  className={iconClass}
+                  aria-hidden="true"
+                />
+                Print Summary
+              </button>
+            )}
+            content={() => componentRef.current}
+          />
         </div>
       </div>
     </div>

@@ -3,158 +3,181 @@ import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
 import axios, { AxiosError } from 'axios';
 import { NextPage } from 'next';
 
-const GPTZero_API_KEY = "caa06262ea9c4815813fa8803085386a";
+const source = axios.CancelToken.source();
 const TEMP_INCREMENT = 0.2;
 const MAX_TEMP = 1.81;
 const TOP_P_INCREMENT = 0.019;
 const MAX_TOP_P = 1.0;
 
+interface Sentence {
+  sentence: string;
+  perplexity: number;
+  generated_prob: number;
+  highlight_sentence_for_ai: boolean;
+}
+
+interface Paragraph {
+  start_sentence_index: number;
+  num_sentences: number;
+  completely_generated_prob: number;
+}
+
+interface Document {
+  average_generated_prob: number;
+  completely_generated_prob: number;
+  overall_burstiness: number;
+  sentences: Sentence[];
+  paragraphs: Paragraph[];
+  result_message: string;
+  document_classification: string;
+}
+
+
+interface RapidApiResponse {
+  success: boolean;
+  data: {
+    is_human_written: number;
+    is_gpt_generated: number;
+    feedback_message: string;
+    gpt_generated_sentences: string[];
+    words_count: number;
+  };
+}
+
 const TextAnalyzer: NextPage = () => {
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
-    const [temp, setTemp] = useState(1.0);
+    const [temp, setTemp] = useState(1.1);
     const [top_p, setTopP] = useState(0.99);
     const [shouldRegenerate, setShouldRegenerate] = useState(false);
     const [isInitialRequest, setIsInitialRequest] = useState(true);
     const [lastSubmittedText, setLastSubmittedText] = useState('');
+    const [responseText, setResponseText] = useState('');
 
     const generateMutation = useMutation(
         async ({ temp, top_p, input }: { temp: number; top_p: number; input: string; }) => {
             let systemMessage = isInitialRequest 
-                ? "You are a professional Paraphraser. Please paraphrase the following text while keeping the purpose and meaning the same. Please also use human-like lexical variation, so that this does not get flagged as AI Written"
-                : "Paraphrase the text again with higher perplexity and burstiness. Your goal is to make it not sound like an AI wrote this, so use high lexical variation and Vary sentence structure.";
-            const response = await axios.post(
-                '/api/humanize_route',
-                {
-                    model: "gpt-3.5-turbo-16k",
-                    messages: [
-                        { role: "system", content: systemMessage },
-                        { role: "user", content: input }
-                    ],
-                    options: {
-                        temperature: temp,
-                        top_p: top_p,
-                    }
-                },
-            );
+                ? "Your task is to paraphrase the following text in a way that avoids looking AI detection. This means you should:\n1. Maintain the semantic meaning of the original text.\n2. Use the context of the surrounding sentences to inform your paraphrase.\n3. Introduce both lexical (word choice) and syntactic (sentence structure) diversity.\n4. Try to paraphrase multiple sentences at once, if possible.\n5. Avoid changing proper names or omitting important content."
+                :  "Your task is to paraphrase the following text in a way that avoids looking AI detection. This means you should:\n1. Maintain the semantic meaning of the original text.\n2. Use the context of the surrounding sentences to inform your paraphrase.\n3. Introduce both lexical (word choice) and syntactic (sentence structure) diversity.\n4. Try to paraphrase multiple sentences at once, if possible.\n5. Avoid changing proper names or omitting important content."
+
+                const response = await axios.post(
+                  '/api/humanize_route',
+                  {
+                      model: "gpt-3.5-turbo-16k",
+                      messages: [
+                          { role: "system", content: systemMessage },
+                          { role: "user", content: input }
+                      ],
+                      options: {
+                          temperature: temp,
+                          top_p: top_p,
+                      }
+                  },
+                  {
+                      cancelToken: source.token
+                  },
+              );
             return response.data;
         },
         {
             onSuccess: (data) => {
                 console.log('API response:', data);
                 if (data?.data?.choices?.[0]?.message?.content) {
-                    let paraphrasedText = data.data.choices[0].message.content;
-                    setInput(paraphrasedText);
-                    analyzeMutation.mutate({ document: paraphrasedText, temp, top_p });
-                    setIsInitialRequest(false);
+                  let paraphrasedText = data.data.choices[0].message.content;
+                  setResponseText(paraphrasedText);
+                  analyzeMutation.mutate({ input_text_from_user: paraphrasedText });
+                  setIsInitialRequest(false);
                 } else {
-                    console.error('Unexpected API response structure');
-                    setOutput('An error occurred during text generation.');
-                }
-            },
-            onError: (error) => {
-                console.log(error);
-                setOutput('An error occurred during text generation.');
-            }        
-        }
-    );
-
-    const analyzeMutation = useMutation(
-        async ({ document, temp, top_p }: { document: string; temp: number; top_p: number }) => {
-            try {
-                setLastSubmittedText(input); // Store the last submitted input
-                console.log(document);
-                const response = await axios({
-                    method: 'POST',
-                    url: 'https://api.gptzero.me/v2/predict/text',
-                    headers: {
-                        'x-api-key': GPTZero_API_KEY,
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json'
-                    },
-                    data: { document, version: '2023-06-12' }
-                });
-                return response.data;
-            } catch (error) {
-                const axiosError = error as AxiosError; // typecast the error to AxiosError
-                console.error('There was an error with the axios request:', axiosError);
-                if (axiosError.response) {
-                    console.error('Response data:', axiosError.response.data);
-                    console.error('Response status:', axiosError.response.status);
-                    console.error('Response headers:', axiosError.response.headers);
-                } else if (axiosError.request) {
-                    console.error('No response received:', axiosError.request);
-                } else {
-                    console.error('Error', axiosError.message);
-                }
-                console.error('Error config:', axiosError.config);
-                throw axiosError; // Re-throw the error so the mutation.onError can handle it
-            }
-        },
-        
-        {
-            onSuccess: (response) => {
-                if (!response?.documents[0]?.document_classification) {
-                    console.error('Unexpected response structure:', response);
-                    return;
-                }
-            
-                const { data } = response;
-                console.log(data);
-            
-                const classification = response.documents[0].document_classification;
-            
-                if (classification === 'HUMAN_ONLY') {
-                    let generatedText = lastSubmittedText;
-                    console.log("Text is human-like");
-                    setOutput(generatedText);
-                } else {
-                    const newTemp = Math.min(MAX_TEMP, temp + TEMP_INCREMENT);
-                    const newTopP = Math.min(MAX_TOP_P, top_p + TOP_P_INCREMENT);
-    
-                    if (newTemp < MAX_TEMP && newTopP < MAX_TOP_P) {
-                        setTemp(newTemp);
-                        setTopP(newTopP);
-                        setShouldRegenerate(true);
-                    } else {
-                        setOutput('Unable to generate human-like text.');
-                    }
+                  console.error('Unexpected API response structure');
+                  setOutput('An error occurred during text generation.');
                 }
             },
             onError: (error: AxiosError) => {
-                console.error('Axios Error:', error);
-                if (error.response) {
-                    console.error('Response:', error.response);
-                } else if (error.request) {
-                    console.error('Request:', error.request);
-                } else {
-                    console.error('Other Error:', error.message);
-                }
-                setOutput('An error occurred during text analysis.');
-            }
+                console.error('API error:', error.response?.data || error.message);
+                setOutput('An error occurred during text generation.');
+            },
         },
     );
-    
+
+    const analyzeMutation = useMutation(
+      async ({ input_text_from_user }: { input_text_from_user: string; }) => {
+        const response = await axios.post(
+          '/api/analyze_route',
+          {
+            input_text : input_text_from_user,
+          },
+          {
+              cancelToken: source.token
+          },
+      );
+          return response.data;
+      },
+      {
+          onSuccess: (response: RapidApiResponse) => {
+              console.log('Full response:', response);
+              console.log('Response data:', response.data);
+  
+              if (response.success) {
+                  if (response.data.is_gpt_generated < 20) {
+                      setOutput(responseText);
+                  } else {
+                      setShouldRegenerate(true);
+                  }
+              } else {
+                  console.error('API response marked as unsuccessful');
+                  setOutput('An error occurred during text analysis.');
+              }
+          },
+          onError: (error: AxiosError) => {
+              console.error('API error:', error.response?.data || error.message);
+              setOutput('An error occurred during text analysis.');
+          },
+      },
+  );
+
     useEffect(() => {
         if (shouldRegenerate) {
-            generateMutation.mutate({ temp, top_p, input });
+            if (temp < MAX_TEMP) {
+                setTemp((oldTemp) => oldTemp + TEMP_INCREMENT);
+            } else if (top_p < MAX_TOP_P) {
+                setTopP((oldTopP) => oldTopP + TOP_P_INCREMENT);
+            }
             setShouldRegenerate(false);
+            generateMutation.mutate({ temp, top_p, input });
         }
     }, [shouldRegenerate, temp, top_p, input, generateMutation]);
 
-    const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleAnalyzeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log(input);  
-        generateMutation.mutate({ temp, top_p, input });
+        if (input !== lastSubmittedText) {
+            setLastSubmittedText(input);
+            generateMutation.mutate({ temp, top_p, input });
+        } else {
+            setShouldRegenerate(true);
+        }
     };
+
+    useEffect(() => {
+      return () => {
+          source.cancel('Component unmounted and request cancelled');
+      }
+  }, []);
 
     return (
         <div>
-            <form onSubmit={handleAnalyzeClick}>
-                <textarea value={input} onChange={(e) => setInput(e.target.value)} />
-                <button type="submit">Analyze and Generate</button>
+            <form>
+                <label>
+                    Input:
+                    <textarea value={input} onChange={(e) => setInput(e.target.value)} />
+                </label>
+                <button onClick={handleAnalyzeClick}>
+                    Analyze
+                </button>
             </form>
-            {output && <div><textarea readOnly value={output} /></div>}
+            <div>
+                Output:
+                <textarea value={output} disabled />
+            </div>
         </div>
     );
 };
