@@ -300,29 +300,6 @@ button,
   cursor: default;
 }
 
-/* 1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14) 2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210) This can trigger a poorly considered lint error in some tools but is included by design. */
-img,
-svg,
-video,
-canvas,
-audio,
-iframe,
-embed,
-object {
-	display: block;
-
-	/* 1 */
-	vertical-align: middle;
-
-	/* 2 */
-}
-
-/* Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14) */
-img,
-video {
-  max-width: 100%;
-  height: auto;
-}
 
 /* Make elements with the HTML hidden attribute stay hidden by default */
 
@@ -2642,8 +2619,6 @@ embed,
 object {
 	display: block;
 
-	/* 1 */
-	vertical-align: middle;
 
 	/* 2 */
 }
@@ -2764,4 +2739,19 @@ video {
 
 .goButton {
   background-color: rgb(37 99 235)!important;
+}
+
+.video-responsive {
+    overflow: hidden;
+    padding-bottom: 56.25%;
+    position: relative;
+    height: 0;
+}
+
+.video-responsive iframe {
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
 }
