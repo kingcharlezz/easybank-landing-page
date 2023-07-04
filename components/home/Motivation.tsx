@@ -34,7 +34,7 @@ export default function Motivation() {
             <h2 className="text-3xl lg:text-4xl text-primary-black pb-5">
               Why choose NoteScribe?
             </h2>
-            <p className="text-neutral-black text-sm lg:text-base leading-5">
+            <p className="text-neutral-black lg:text-base leading-5">
               We leverage the latest in AI technology to help you learn and pass classes with less effort 
               than ever required before. We are the future of education.
             </p>
@@ -50,7 +50,7 @@ export default function Motivation() {
               <h2 className="text-lg text-primary-black py-4 lg:pt-9 lg:pb-6 lg:text-xl lg:font-bold">
                 {item.title}
               </h2>
-              <p className="text-neutral-black text-sm font-light lg:text-base leading-5">
+              <p className="text-neutral-black font-light lg:text-base leading-5">
                 {item.subtitle}
               </p>
             </div>

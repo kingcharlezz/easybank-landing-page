@@ -33,14 +33,28 @@ export default function Example({ darkMode }: ExampleProps) {
   const [ts, setTs] = useState(0);
 
   const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    setUid(user.uid);
-    console.log(uid); 
-  } else {
-    console.log("No user is signed in.");
-  }
-});
+
+  useEffect(() => {
+    document.body.style.backgroundColor = darkMode ? 'rgb(52, 53, 65)' : 'white';
+
+    // clean up function to reset style when component unmounts
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [darkMode]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUid(user.uid);
+        console.log(user.uid);
+      } else {
+        console.log("No user is signed in.");
+      }
+    });
+  
+    return () => unsubscribe();
+  }, []);
 
   function LinkRenderer(props: any) {
     const href = props.href;
@@ -67,7 +81,7 @@ onAuthStateChanged(auth, (user) => {
       </a>
   );
 }
-
+  
   const generateSummary = async (e: any) => {
     e.preventDefault;
 
@@ -104,7 +118,7 @@ onAuthStateChanged(auth, (user) => {
       });
 
       if (!responseVideoID.ok) {
-        toast.error("Error saving video id.");
+        toast.success("Video ID Already Saved");
         setLoading(false);
         throw new Error(responseVideoID.statusText);
       }
@@ -331,7 +345,7 @@ onAuthStateChanged(auth, (user) => {
     }
   }, []);
   return (
-    <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
+    <div className={`flex flex-col text-center ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
       <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>
         <ToastContainer />
         <div className="mx-auto lg:grid lg:grid-cols-12 lg:gap-x-8 lg:px-8">

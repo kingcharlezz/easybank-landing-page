@@ -1,3 +1,4 @@
+import Link from 'next/link';
 export default function Hero() {
   return (
     <section id="hero" className="relative">
@@ -10,13 +11,22 @@ export default function Hero() {
             <h1 className="text-4xl lg:text-5xl text-primary-black pb-5">
             Revolutionize your learning 
             </h1>
-            <p className="text-neutral-black text-xs lg:text-base leading-5 mb-7">
+            <p className="text-neutral-black text-lg lg:text-base leading-5 mb-7">
             The Student Ally AI Suite will be your one-stop solution for automated note taking, rewriting AI-composed essays to avoid detection, 
             and answering course-specific questions, plus so much more.
             </p>
-            <button className="bg-primary-bright-cyan px-7 py-3 rounded-full text-neutral-white text-xs bg-gradient-to-r from-primary-bright-cyan to-primary-bright-cyan hover:button-brightness mb-7 focus:outline-none focus:ring ring-green-400">
-              Request Invite
-            </button>
+            <div className="flex justify-between">
+              <Link href="../login">
+                <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>
+                  Login
+                </button>
+              </Link>
+              <Link href="../signup">
+                <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#444', cursor: 'pointer' }}>
+                  Signup
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

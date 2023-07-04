@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-
+require("dotenv").config();
 export const dynamic = "force-dynamic";
 
 const prisma = new PrismaClient();

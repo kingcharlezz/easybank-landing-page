@@ -105,7 +105,7 @@ pre {
 
 /* Add the correct font size in all browsers. */
 small {
-  font-size: 80%;
+  font-size: 100%;
 }
 
 /* Prevent `sub` and `sup` elements from affecting the line height in all browsers. */
@@ -2405,7 +2405,7 @@ pre {
 
 /* Add the correct font size in all browsers. */
 small {
-	font-size: 80%;
+	font-size: 100%;
 }
 
 /* Prevent `sub` and `sup` elements from affecting the line height in all browsers. */
@@ -2754,4 +2754,26 @@ video {
     height: 100%;
     width: 100%;
     position: absolute;
+}
+
+div {
+    font-family: inherit
+}
+
+/* Default light mode */
+.body-light {
+    background-color: white;
+    color: black;
+}
+
+/* Dark mode */
+.body-dark {
+    background-color: rgb(52, 53, 65);
+    color: white;
+}
+
+body, html {
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
 }

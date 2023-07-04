@@ -14,7 +14,7 @@ export default function Navbar() {
             <img src="images/notescribe.png" alt="notescribe logo" />
           </div>
 
-          <div className="hidden lg:flex text-sm text-neutral-black">
+          <div className="hidden lg:flex text-lg font-bold text-neutral-black ">
             {navItems.map((navItem, index) => (
               <a key={index} className="mx-3 py-5 hover:gradient-border-bottom" href="#">
                 {navItem}
@@ -24,12 +24,12 @@ export default function Navbar() {
 
           <div className="hidden lg:flex">
             <Link href="../login">
-              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>
+              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>
                 Login
               </button>
             </Link>
             <Link href="../signup">
-              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#444', cursor: 'pointer' }}>
+              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#444', cursor: 'pointer' }}>
                 Signup
               </button>
             </Link>
