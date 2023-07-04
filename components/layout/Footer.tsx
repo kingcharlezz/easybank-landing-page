@@ -58,7 +58,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 py-1 lg:grid-rows-3 text-white text-sm lg:text-left lg:justify-self-start lg:col-span-5 lg:gap-x-24 lg:grid-flow-col-dense">
+          <div className="grid grid-cols-1 gap-2 py-1 lg:grid-rows-3 text-white lg:text-left lg:justify-self-start lg:col-span-5 lg:gap-x-24 lg:grid-flow-col-dense">
             <a className="hover:text-green-400" href="#">
               About Us
             </a>
@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col justify-between items-center lg:items-end lg:justify-self-end lg:col-span-4">
-            <button className="bg-primary-bright-cyan px-7 py-3 rounded-full text-neutral-white text-xs bg-gradient-to-r from-primary-bright-cyan to-primary-bright-cyan hover:button-brightness mb-7 focus:outline-none focus:ring ring-green-400">
+            <button className="bg-primary-bright-cyan px-7 py-3 rounded-full text-neutral-white bg-gradient-to-r from-primary-bright-cyan to-primary-bright-cyan hover:button-brightness mb-7 focus:outline-none focus:ring ring-green-400">
               Request Invite
             </button>
 
