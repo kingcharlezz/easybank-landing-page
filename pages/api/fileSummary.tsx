@@ -18,6 +18,8 @@ async function FileSummary(payload: StreamPayload) {
   formData.append("model", "tiny");
   formData.append("use_sse", "true");
   formData.append("file", payload.file);
+
+
   
   const res = await fetch("https://brilliant-panda-production.up.railway.app/transcribe_file", {
     headers: {

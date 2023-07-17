@@ -25,7 +25,7 @@
     "**/*.tsx",
     "components/layout/Navbar.js",
     "components/auth.js"
-  ],
+, "components/AccountPage.js"  ],
   "exclude": [
     "node_modules"
   ]
