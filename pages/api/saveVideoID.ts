@@ -35,6 +35,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { uid, videoId } = req.body;
+  if (!uid || !videoId) {
+    return res.status(400).json({message: 'Missing uid or videoId'});
+  }
+  
   const userRef = db.collection('users').doc(uid);
   const videoRef = userRef.collection('transcribedVideos').doc(videoId);
 

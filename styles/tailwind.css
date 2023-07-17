@@ -2777,3 +2777,36 @@ body, html {
 	margin: 0;
 	padding: 0;
 }
+
+.myButton {
+	height: 50% !important;
+	width: 90% !important; 
+	display: flex !important; 
+	justify-content: center !important; 
+	align-items: center !important; 
+	font-size: 1.75rem !important;
+}
+
+.myGrid {
+	display: grid !important;
+	grid-template-columns: repeat(4, 1fr) !important;
+	min-height: calc(100vh - 4rem) !important;
+	padding: 1.5rem !important;
+	gap: 2rem !important; /* add some gap between grid items */
+  }
+  
+  .myGrid {
+	display: grid !important;
+	grid-template-columns: repeat(4, 1fr) !important;
+	min-height: calc(100vh - 4rem) !important;
+	padding: 1.5rem !important;
+	gap: 2rem !important; /* add some gap between grid items */
+  }
+  
+  .myButton:nth-child(odd) {
+	background-color: rgb(37 99 235) !important; /* color for odd buttons */
+  }
+
+  .myButton:nth-child(even) {
+	background-color: #00cac0 !important; /* color for odd buttons */
+  }

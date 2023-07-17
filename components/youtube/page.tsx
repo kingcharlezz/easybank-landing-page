@@ -18,6 +18,47 @@ type ExampleProps = {
 import { extractVideoId } from "./utils";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import 'firebase/auth';
+import { getFirestore, doc, updateDoc, getDoc, setDoc, collection , addDoc  } from "firebase/firestore";
+import { v4 as uuidv4 } from 'uuid';
+const auth = getAuth();
+const db = getFirestore();
+
+
+
+
+
+// Define the incrementCounter function
+async function incrementCounter(apiName: string) {
+  const user = auth.currentUser;
+
+  if (user) {
+    const userRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userRef);
+    
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const apiCounts = userData.apiCounts || {};
+
+      if (apiCounts[apiName]) {
+        apiCounts[apiName] += 1;
+      } else {
+        apiCounts[apiName] = 1;
+      }
+
+      console.log(`Updating user ${user.uid} with data:`, { apiCounts: apiCounts });
+      await updateDoc(userRef, { apiCounts: apiCounts });
+    } else {
+      const apiCounts = { [apiName]: 1 };
+        console.log(`Setting doc for user ${user.uid} with data:`, { apiCounts: apiCounts });
+      await setDoc(userRef, { apiCounts: apiCounts });
+    }
+  } else {
+    // Handle case where there is no user signed in
+    console.log("No user is signed in.");
+  }
+}
+
 
 
 
@@ -26,13 +67,57 @@ export default function Example({ darkMode }: ExampleProps) {
   const [url, setUrl] = useState("");
   const urlRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const classRef = useRef<HTMLInputElement>(null);
   const [uid, setUid] = useState("");
+  
 
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
   const [ts, setTs] = useState(0);
 
   const auth = getAuth();
+
+  const [classInput, setClassInput] = useState("");
+  const [classSuggestions, setClassSuggestions] = useState<string[]>([]);
+  const [allClassNames, setAllClassNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchClassNames = async () => {
+      if (!uid) {
+        // If uid is not defined, don't try to fetch class names
+        return;
+      }
+  
+      const userRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const classes = userData.classes || {};
+        
+        // Extract the class names and update the state
+        const classNames = Object.keys(classes);
+        setAllClassNames(classNames);
+      }
+    };
+  
+    fetchClassNames();
+  }, [uid]);
+
+const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const value = event.target.value;
+  setClassInput(value);
+
+  if (value === "") {
+    setClassSuggestions([]);
+  } else {
+    const suggestions = allClassNames.filter((className) =>
+      className.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setClassSuggestions(suggestions);
+  }
+};
+
 
   useEffect(() => {
     document.body.style.backgroundColor = darkMode ? 'rgb(52, 53, 65)' : 'white';
@@ -106,6 +191,40 @@ export default function Example({ darkMode }: ExampleProps) {
 
     try {
       const videoId = extractVideoId(currentUrl);
+      const className = classRef.current?.value;  // Make sure to create this ref
+    try {
+      const userRef = doc(db, "users", uid);   // Reference to the user document
+      const userDoc = await getDoc(userRef);   // Get the user document
+  
+      if (userDoc.exists()) {
+        if (!className) {
+          console.error("className is undefined or null");
+          return;
+      }
+      
+      if (!videoId) {
+          console.error("videoId is undefined or null");
+          return;
+      }
+          const userData = userDoc.data();
+          const userClasses = userData.classes || {};  // Get the classes object
+  
+          // Add the new class and videoId to the userClasses object
+          if (className && userClasses[className]) {
+              userClasses[className].push(videoId);
+          } else if (className) {
+              userClasses[className] = [videoId];
+          }
+  
+          // Update the user document
+          await updateDoc(userRef, { classes: userClasses });
+      } else {
+          // Handle the case where the user document doesn't exist
+          console.log("User document does not exist.");
+      }
+  } catch (error) {
+      console.error("Error writing document: ", error);
+  }
       const responseVideoID = await fetch("/api/saveVideoID", {
         method: "POST",
         headers: {
@@ -146,6 +265,7 @@ export default function Example({ darkMode }: ExampleProps) {
       toast.success("Generating Summary!");
     }
 
+    
     // This data is a ReadableStream
     const data = response.body;
     if (!data) {
@@ -166,6 +286,8 @@ export default function Example({ darkMode }: ExampleProps) {
     toast.success("Summary completed!");
     setLoading(false);
     console.log("Summary completed!", summary);
+
+    incrementCounter('summary'); // Add this line
   };
 
   
@@ -188,6 +310,8 @@ export default function Example({ darkMode }: ExampleProps) {
       toast.error("Invalid file type. Please upload a valid audio/video file.");
       return;
     }
+
+    
   
     setStart(true);
     setSummary("");
@@ -197,6 +321,30 @@ export default function Example({ darkMode }: ExampleProps) {
     formData.append("model", "tiny");
     formData.append("use_sse", "true");
     formData.append("file", currentFile);
+    const videoID = uuidv4();
+    formData.append("url", videoID);
+
+    try {
+      const responseVideoID = await fetch("/api/saveVideoID", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoID: videoID,
+          uid: uid,
+        }),
+      });
+
+      if (!responseVideoID.ok) {
+        toast.success("Video ID Already Saved");
+        setLoading(false);
+        throw new Error(responseVideoID.statusText);
+      }
+    } catch (err) {
+      console.log("Error while saving VideoID: ", err);
+    }
+    
   
     const response = await fetch("https://brilliant-panda-production.up.railway.app/transcribe_file", {
       method: "POST",
@@ -205,7 +353,7 @@ export default function Example({ darkMode }: ExampleProps) {
       },
       body: formData,
     });
-  
+    
     if (!response.ok) {
       const errorMessage = `Error generating transcript: ${response.statusText}`;
       toast.error(errorMessage);
@@ -214,7 +362,34 @@ export default function Example({ darkMode }: ExampleProps) {
     } else {
       toast.success("Generating Summary!");
     }
+    
+    const className = classRef.current?.value;  // Make sure to create this ref
+
+    try {
+      const userRef = doc(db, "users", uid);   // Reference to the user document
+      const userDoc = await getDoc(userRef);   // Get the user document
   
+      if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const userClasses = userData.classes || {};  // Get the classes object
+  
+          // Add the new class and videoId to the userClasses object
+          if (className && userClasses[className]) {
+              userClasses[className].push(videoId);
+          } else if (className) {
+              userClasses[className] = [videoId];
+          }
+  
+          // Update the user document
+          await updateDoc(userRef, { classes: userClasses });
+      } else {
+          // Handle the case where the user document doesn't exist
+          console.log("User document does not exist.");
+      }
+  } catch (error) {
+      console.error("Error writing document: ", error);
+  }
+
     const data = response.body;
     if (!data) {
       return;
@@ -255,6 +430,7 @@ export default function Example({ darkMode }: ExampleProps) {
       setLoading(false);
       console.log("Summary completed!", summary);
     }
+    incrementCounter('summary'); // Add this line
   };
 
   const handleProcessing = () => {
@@ -295,6 +471,7 @@ export default function Example({ darkMode }: ExampleProps) {
     } else {
       toast.success("Generating Summary!");
     }
+
 
     // This data is a ReadableStream
     const data = response.body;
@@ -384,6 +561,31 @@ export default function Example({ darkMode }: ExampleProps) {
                     className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-neutral-white' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
                   />
                 </div>
+                <div className="relative">
+                <label htmlFor="file" className={`absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium ${darkMode ? 'text-gray-900' : 'text-gray-900'}`}>
+                      Class Name
+                  </label>
+                  <input
+                    type="text"
+                    name="class"
+                    id="class"
+                    ref={classRef}
+                    size={40}
+                    className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-gray-900' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
+                    placeholder="Enter Class Name"
+                    value={classInput}
+                    onChange={handleClassInputChange}
+                />
+                 {classSuggestions.map((suggestion) => (
+                  <div 
+                  key={suggestion} 
+                  onClick={() => setClassInput(suggestion)}
+                  className={`bg-white text-gray-900 py-1 px-2 cursor-pointer hover:bg-gray-200`}
+                >
+                  {suggestion}
+                </div>
+              ))}
+              </div>
                 <button
                   onClick={handleProcessing}
                   disabled={loading}
