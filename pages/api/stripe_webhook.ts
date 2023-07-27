@@ -82,8 +82,8 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
     // Include HTTP method in the response body
     nextRes.json({ received: true, method: nextReq.method });
   } else {
-    nextRes.setHeader('Allow', 'POST');
     nextRes.status(405).end(`Method not allowed. Current method: ${nextReq.method}`);
+    nextRes.setHeader('Allow', 'POST');
   }
 };
 
