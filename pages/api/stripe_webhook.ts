@@ -54,6 +54,7 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
   const nextReq = req as NextApiRequest;
   const nextRes = res as NextApiResponse;
 
+  console.log("HTTP method:", nextReq.method); // logs the HTTP method
   if (nextReq.method === 'POST') {
     const buf = await buffer(nextReq);
     const sig = nextReq.headers['stripe-signature'];
