@@ -6,7 +6,7 @@ import { firestore } from 'firebase-admin';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingMessage, ServerResponse } from 'http';
 
-const endpointSecret = "whsec_6673e7d60ce4440a0e5a0ba1e1ac1dda99c94660749f7e01d93a99ee8ed5fe4a";
+const endpointSecret = process.env.WEBHOOK_SIGNING_SECRET;
 
 
 // Initialize Firestore
