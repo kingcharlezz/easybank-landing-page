@@ -54,7 +54,6 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
   const nextReq = req as NextApiRequest;
   const nextRes = res as NextApiResponse;
 
-  console.log("HTTP method:", nextReq.method); // logs the HTTP method
   if (nextReq.method === 'POST') {
     const buf = await buffer(nextReq);
     const sig = nextReq.headers['stripe-signature'];
@@ -67,7 +66,7 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
       nextRes.status(400).send(`Webhook error: ${(err as Error).message}`);
       return;
     }
-    
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any;
 
@@ -80,10 +79,11 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
       console.log("Payment was successful. ", session);
     }
 
-    nextRes.json({ received: true });
+    // Include HTTP method in the response body
+    nextRes.json({ received: true, method: nextReq.method });
   } else {
     nextRes.setHeader('Allow', 'POST');
-    nextRes.status(405).end('Method not allowed');
+    nextRes.status(405).end(`Method not allowed. Current method: ${nextReq.method}`);
   }
 };
 
