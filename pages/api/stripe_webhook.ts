@@ -74,21 +74,32 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
       
       // Query Firestore for the user document with the matching stripeCustomerId
       const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
-      
+  
       // Ensure we found a user
       if (!userSnap.empty) {
         const userDoc = userSnap.docs[0];
         
-        await userDoc.ref.collection('accountinfo').doc('info').set({
-          paymentTier: 'Premium',
-        }, { merge: true });
+        let paymentTier;
+        if (session.amount_subtotal === 499) {
+          paymentTier = 'Premium';
+        } else if (session.amount_subtotal === 999) {
+          paymentTier = 'PremiumPlus';
+        }
     
-        console.log("Payment was successful. ", session);
+        if (paymentTier) {
+          await userDoc.ref.collection('accountinfo').doc('info').set({
+            paymentTier: paymentTier,
+          }, { merge: true });
+    
+          console.log("Payment was successful. ", session);
+        } else {
+          console.log("No matching payment tier for amount: ", session.amount_subtotal);
+        }
+        
       } else {
         console.log("No user found with the provided Stripe customer ID: ", stripeCustomerId);
       }
     }
-
     // Include HTTP method in the response body
     nextRes.json({ received: true, method: nextReq.method });
   } else {
