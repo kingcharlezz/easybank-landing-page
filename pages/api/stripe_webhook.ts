@@ -67,28 +67,23 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
 
-    // Handle different event types
-    switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object as any;
-        const userId = session.customer ? session.customer : '';
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as any;
+
+      const userId = session.customer ? session.customer : '';
     
-        await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
-          paymentTier: 'premium',
-        });
+      await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
+        paymentTier: 'premium',
+      });
     
-        console.log("Payment was successful. ", session);
-        break;
-      default:
-        console.log(`Unhandled event type ${event.type}`);
+      console.log("Payment was successful. ", session);
     }
 
     // Include HTTP method in the response body
     nextRes.json({ received: true, method: nextReq.method });
   } else {
-    console
-    nextRes.json(`Method not allowed. Current method: ${nextReq.method}`);
     nextRes.setHeader('Allow', 'POST');
+    nextRes.status(405).end(`Method not allowed. Current method: ${nextReq.method}`);
   }
 };
 
