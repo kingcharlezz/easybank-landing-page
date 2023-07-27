@@ -6,7 +6,7 @@ import { firestore } from 'firebase-admin';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingMessage, ServerResponse } from 'http';
 
-const endpointSecret = process.env.WEBHOOK_SIGNING_SECRET;
+const endpointSecret = process.env.WEBHOOK_SIGNING_SECRET || '';
 
 
 // Initialize Firestore
@@ -48,63 +48,103 @@ export const config = {
   api: {
     bodyParser: false,
   },
+
+};
+interface Session {
+  customer?: string;
+  amount_subtotal?: number;
+}
+
+interface Subscription {
+  customer?: string;
+  status?: string;
+}
+
+const handleCheckoutSessionCompleted = async (session: Session) => {
+  const stripeCustomerId = session.customer || '';
+  const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
+  
+  if (!userSnap.empty) {
+    const userDoc = userSnap.docs[0];
+    let paymentTier: string | undefined;
+    
+    if (session.amount_subtotal === 499) {
+      paymentTier = 'Premium';
+    } else if (session.amount_subtotal === 999) {
+      paymentTier = 'PremiumPlus';
+    }
+
+    if (paymentTier) {
+      await userDoc.ref.collection('accountinfo').doc('info').set({
+        paymentTier: paymentTier,
+      }, { merge: true });
+    }
+  }
+};
+
+const handleSubscriptionUpdated = async (subscription: Subscription) => {
+  const stripeCustomerId = subscription.customer || '';
+  const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
+  
+  if (!userSnap.empty) {
+    const userDoc = userSnap.docs[0];
+
+    // Update subscription status
+    await userDoc.ref.collection('accountinfo').doc('info').set({
+      subscriptionStatus: subscription.status,
+    }, { merge: true });
+  }
+};
+
+const handleSubscriptionDeleted = async (subscription: Subscription) => {
+  const stripeCustomerId = subscription.customer || '';
+  const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
+  
+  if (!userSnap.empty) {
+    const userDoc = userSnap.docs[0];
+
+    // Remove subscription status
+    await userDoc.ref.collection('accountinfo').doc('info').set({
+      subscriptionStatus: 'inactive',
+      paymentTier: 'Free',
+    }, { merge: true });
+  }
 };
 
 const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
-  const nextReq = req as NextApiRequest;
-  const nextRes = res as NextApiResponse;
+  if (req.method === 'POST') {
+    const buf = await buffer(req);
+    const sig = req.headers['stripe-signature'] || '';
 
-  if (nextReq.method === 'POST') {
-    const buf = await buffer(nextReq);
-    const sig = nextReq.headers['stripe-signature'];
-
-    let event;
+    let event: Stripe.Event;
     try {
-      if (!sig) throw new Error('Missing Stripe Signature');
-      event = stripe.webhooks.constructEvent(buf.toString(), sig, endpointSecret || '');
+      event = stripe.webhooks.constructEvent(buf.toString(), sig, endpointSecret);
     } catch (err) {
-      nextRes.status(400).send(`Webhook error: ${(err as Error).message}`);
+      res.statusCode = 400;
+      res.end(`Webhook error: ${(err as Error).message}`);
       return;
     }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any;
-    
-      const stripeCustomerId = session.customer ? session.customer : '';
-      
-      // Query Firestore for the user document with the matching stripeCustomerId
-      const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
-  
-      // Ensure we found a user
-      if (!userSnap.empty) {
-        const userDoc = userSnap.docs[0];
-        
-        let paymentTier;
-        if (session.amount_subtotal === 499) {
-          paymentTier = 'Premium';
-        } else if (session.amount_subtotal === 999) {
-          paymentTier = 'PremiumPlus';
-        }
-    
-        if (paymentTier) {
-          await userDoc.ref.collection('accountinfo').doc('info').set({
-            paymentTier: paymentTier,
-          }, { merge: true });
-    
-          console.log("Payment was successful. ", session);
-        } else {
-          console.log("No matching payment tier for amount: ", session.amount_subtotal);
-        }
-        
-      } else {
-        console.log("No user found with the provided Stripe customer ID: ", stripeCustomerId);
-      }
+    switch(event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object as Session);
+        break;
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object as Subscription);
+        break;
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object as Subscription);
+        break;
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
-    // Include HTTP method in the response body
-    nextRes.json({ received: true, method: nextReq.method });
+
+    res.statusCode = 200;
+    res.end(JSON.stringify({ received: true, method: req.method }));
   } else {
-    nextRes.setHeader('Allow', 'POST');
-    nextRes.status(405).send(`Method not allowed. Current method: ${nextReq.method}`);
+    res.setHeader('Allow', 'POST');
+    res.statusCode = 405;
+    res.end(`Method not allowed. Current method: ${req.method}`);
   }
 };
 
