@@ -67,16 +67,20 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
       return;
     }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any;
-
-      const userId = session.customer ? session.customer : '';
+    // Handle different event types
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object as any;
+        const userId = session.customer ? session.customer : '';
     
-      await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
-        paymentTier: 'premium',
-      });
+        await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
+          paymentTier: 'premium',
+        });
     
-      console.log("Payment was successful. ", session);
+        console.log("Payment was successful. ", session);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
     }
 
     // Include HTTP method in the response body
