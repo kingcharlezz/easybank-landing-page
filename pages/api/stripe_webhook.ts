@@ -1,7 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
+import { buffer } from 'micro';
+import Cors from 'micro-cors';
 import admin from 'firebase-admin';
-import { firestore } from 'firebase-admin'; // Import Firestore from Firebase Admin SDK
+import { firestore } from 'firebase-admin'; 
+import { NextApiRequest, NextApiResponse } from 'next';
+import { IncomingMessage, ServerResponse } from 'http';
+
+const endpointSecret = "whsec_6673e7d60ce4440a0e5a0ba1e1ac1dda99c94660749f7e01d93a99ee8ed5fe4a";
+
+
 // Initialize Firestore
 if (!admin.apps.length) {
   const serviceAccount = {
@@ -31,29 +38,52 @@ if (!admin.apps.length) {
 
 const db = firestore();
 
-
-// Initialize Stripe with your secret key
 const stripe = new Stripe("sk_test_51NWlFcBvnwuagBF32v2nEfSPedUdPO85zrv6r7qgRHn5GecwtAcEZDQgSTevowiAWk1TDnJjzt9bz5Y3XgTNBpHC00zTwnmGeN", { apiVersion: '2022-11-15' });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { priceId } = req.body;
-  const { userId } = req.body;
+const cors = Cors({
+  allowMethods: ['POST', 'HEAD'],
+});
 
-  const session = await stripe.checkout.sessions.create({
-    customer: userId,
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
-    mode: 'subscription',
-    success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${req.headers.origin}/cancelled`,
-  });
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-  res.send({
-    sessionId: session.id,
-  });
-}
+const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
+  const nextReq = req as NextApiRequest;
+  const nextRes = res as NextApiResponse;
+
+  if (nextReq.method === 'POST') {
+    const buf = await buffer(nextReq);
+    const sig = nextReq.headers['stripe-signature'];
+
+    let event;
+    try {
+      if (!sig) throw new Error('Missing Stripe Signature');
+      event = stripe.webhooks.constructEvent(buf.toString(), sig, endpointSecret);
+    } catch (err) {
+      nextRes.status(400).send(`Webhook error: ${(err as Error).message}`);
+      return;
+    }
+    
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as any;
+
+      const userId = session.customer ? session.customer : '';
+    
+      await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
+        paymentTier: 'premium',
+      });
+    
+      console.log("Payment was successful. ", session);
+    }
+
+    nextRes.json({ received: true });
+  } else {
+    nextRes.setHeader('Allow', 'POST');
+    nextRes.status(405).end('Method not allowed');
+  }
+};
+
+export default cors(webhookHandler);
