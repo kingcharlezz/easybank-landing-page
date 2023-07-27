@@ -120,15 +120,6 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
 
   useEffect(() => {
-    document.body.style.backgroundColor = darkMode ? 'rgb(52, 53, 65)' : 'white';
-
-    // clean up function to reset style when component unmounts
-    return () => {
-      document.body.style.backgroundColor = '';
-    };
-  }, [darkMode]);
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUid(user.uid);
@@ -167,130 +158,139 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   );
 }
   
-  const generateSummary = async (e: any) => {
-    e.preventDefault;
+const generateSummary = async (e: any) => {
+  e.preventDefault();
 
-    if (!urlRef.current) {
-      toast.error("Please enter a valid youtube url");
-      return;
-    }
+  if (!urlRef.current) {
+    toast.error("Please enter a valid youtube url");
+    return;
+  }
 
-    // @ts-ignore
-    const currentUrl = urlRef.current.value as string;
+  // @ts-ignore
+  const currentUrl = urlRef.current.value as string;
 
-    // use regex to check if url is youtube linke
-    if (!isValidYoutubeUrl(currentUrl)) {
-      toast.error("Please enter a valid youtube url");
-      return;
-    }
+  // use regex to check if url is youtube link
+  if (!isValidYoutubeUrl(currentUrl)) {
+    toast.error("Please enter a valid youtube url");
+    return;
+  }
 
-    setStart(true);
-    setSummary("");
-    setLoading(true);
-    setUrl(currentUrl);
+  setStart(true);
+  setSummary("");
+  setLoading(true);
+  setUrl(currentUrl);
+  const videoId = extractVideoId(currentUrl);
 
-    try {
-      const videoId = extractVideoId(currentUrl);
-      const className = classRef.current?.value;  // Make sure to create this ref
+  try {
+    const className = classRef.current?.value;  // Make sure to create this ref
     try {
       const userRef = doc(db, "users", uid);   // Reference to the user document
       const userDoc = await getDoc(userRef);   // Get the user document
-  
+    
       if (userDoc.exists()) {
-        if (!className) {
-          console.error("className is undefined or null");
-          return;
-      }
-      
-      if (!videoId) {
-          console.error("videoId is undefined or null");
-          return;
-      }
-          const userData = userDoc.data();
-          const userClasses = userData.classes || {};  // Get the classes object
-  
-          // Add the new class and videoId to the userClasses object
-          if (className && userClasses[className]) {
-              userClasses[className].push(videoId);
-          } else if (className) {
-              userClasses[className] = [videoId];
+        const userData = userDoc.data();
+        const userClasses = userData.classes || {};  // Get the classes object
+    
+        // If className and videoId are defined, add them to the userClasses object
+        if (className && videoId) {
+          if (userClasses[className]) {
+            userClasses[className].push(videoId);
+          } else {
+            userClasses[className] = [videoId];
           }
-  
+    
           // Update the user document
           await updateDoc(userRef, { classes: userClasses });
+        } 
       } else {
-          // Handle the case where the user document doesn't exist
-          console.log("User document does not exist.");
+        // Handle the case where the user document doesn't exist
+        console.log("User document does not exist.");
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error writing document: ", error);
-  }
-      const responseVideoID = await fetch("/api/saveVideoID", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          videoId: videoId,
-          uid: uid,
-        }),
-      });
-
-      if (!responseVideoID.ok) {
-        toast.success("Video ID Already Saved");
-        setLoading(false);
-        throw new Error(responseVideoID.statusText);
-      }
-    } catch (err) {
-      console.log("Error while saving VideoID: ", err);
     }
-    
-    const response = await fetch("/api/summary", {
+    const responseVideoID = await fetch("/api/saveVideoID", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        url: currentUrl,
+        videoId: videoId,
+        uid: uid,
       }),
     });
-    console.log("Edge function returned.");
-    console.log(response);
 
-    if (!response.ok) {
-      toast.error("Error generating summary.");
+    if (!responseVideoID.ok) {
+      toast.success("Video ID Already Saved");
       setLoading(false);
-      throw new Error(response.statusText);
-    } else {
-      toast.success("Generating Summary!");
+      throw new Error(responseVideoID.statusText);
     }
+  } catch (err) {
+    console.log("Error while saving VideoID: ", err);
+  }
 
-    
-    // This data is a ReadableStream
-    const data = response.body;
-    if (!data) {
-      return;
-    }
+  const response = await fetch("/api/summary", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url: currentUrl,
+    }),
+  });
+  console.log(videoId)
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+  console.log("Edge function returned.");
+  console.log(response);
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      setSummary((prev) => prev + chunkValue);
-    }
-
-    toast.success("Summary completed!");
+  if (!response.ok) {
+    toast.error("Error generating summary.");
     setLoading(false);
-    console.log("Summary completed!", summary);
+    throw new Error(response.statusText);
+  } else {
+    toast.success("Generating Summary!");
+  }
+  console.log(videoId)
+  // This data is a ReadableStream
+  const data = response.body;
+  if (!data) {
+    return;
+  }
 
-    incrementCounter('summary'); // Add this line
-  };
+  const reader = data.getReader();
+  const decoder = new TextDecoder();
+  let done = false;
+  let localSummary = "";
 
-  
+  while (!done) {
+    const { value, done: doneReading } = await reader.read();
+    done = doneReading;
+    const chunkValue = decoder.decode(value);
+    localSummary += chunkValue;
+    setSummary((prev) => prev + chunkValue);
+  }
+/*
+  if (videoId) {
+    const embeddings = await generateEmbeddings(localSummary, videoId);
+    if (embeddings) {
+      // Save embeddings to your database along with videoId
+      // This will be done in your server-side code
+      console.log("Embeddings generated:", embeddings);
+    } else {
+      console.log("Failed to generate embeddings.");
+    }
+  } else {
+    console.log("Failed to generate embeddings because videoId is null.");
+  }
+  */
+
+  toast.success("Summary completed!");
+  setLoading(false);
+  console.log("Summary completed!", summary);
+
+  incrementCounter('summary'); // Add this line
+};
+
   const generateFileSummary = async (e: any) => {
     e.preventDefault();
   
@@ -368,27 +368,29 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const userRef = doc(db, "users", uid);   // Reference to the user document
       const userDoc = await getDoc(userRef);   // Get the user document
-  
+    
       if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const userClasses = userData.classes || {};  // Get the classes object
-  
-          // Add the new class and videoId to the userClasses object
-          if (className && userClasses[className]) {
-              userClasses[className].push(videoId);
-          } else if (className) {
-              userClasses[className] = [videoId];
+        const userData = userDoc.data();
+        const userClasses = userData.classes || {};  // Get the classes object
+    
+        // If className and videoId are defined, add them to the userClasses object
+        if (className && videoId) {
+          if (userClasses[className]) {
+            userClasses[className].push(videoId);
+          } else {
+            userClasses[className] = [videoId];
           }
-  
+    
           // Update the user document
           await updateDoc(userRef, { classes: userClasses });
+        } 
       } else {
-          // Handle the case where the user document doesn't exist
-          console.log("User document does not exist.");
+        // Handle the case where the user document doesn't exist
+        console.log("User document does not exist.");
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error writing document: ", error);
-  }
+    }
 
     const data = response.body;
     if (!data) {
@@ -491,6 +493,20 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const chunkValue = decoder.decode(value);
       setSummary((prev) => prev + chunkValue);
     }
+    /*
+    if (videoId) {
+      const embeddings = await generateEmbeddings(summary, videoId);
+      if (embeddings) {
+        // Save embeddings to your database along with videoId
+        // This will be done in your server-side code
+        console.log("Embeddings generated:", embeddings);
+      } else {
+        console.log("Failed to generate embeddings.");
+      }
+    } else {
+      console.log("Failed to generate embeddings because videoId is null.");
+    }
+    */
 
     toast.success("Summary shorten completed!");
     setLoading(false);
@@ -521,6 +537,46 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       });
     }
   }, []);
+/*
+  const generateEmbeddings = async (text: string, videoId: string) => {
+    try {
+      const response = await fetch("/api/generateEmbeddings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: text }),
+      });
+  
+      if (!response.ok) {
+        console.log("Error generating embeddings: ", response.statusText);
+        return null;
+      }
+  
+      const data = await response.json();
+      const embeddings = data.embeddings; // Assuming the embeddings are returned under the key 'embeddings'
+  
+      const saveResponse = await fetch('/api/saveEmbeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ videoId: videoId, embeddings: embeddings })
+      });
+  
+      if (!saveResponse.ok) {
+        console.log("Error saving embeddings: ", saveResponse.statusText);
+        return null;
+      }
+  
+      return embeddings;
+    } catch (err) {
+      console.log("Error while generating embeddings: ", err);
+      return null;
+    }
+  };
+*/
+
   return (
     <div className={`flex flex-col text-center ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
       <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>

@@ -6,11 +6,10 @@ import TextAnalyzerPage from '../components/humanizer/page';
 import { UserContext } from './_app';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import { FaUsers, FaDollarSign, FaBoxOpen, FaShoppingCart } from 'react-icons/fa';
 import { useSpring, animated } from '@react-spring/web'
 import AccountPage from '../components/AccountPage';
 import ClassPage from '../components/ClassPage';
-
+import SubscriptionPage from '../components/SubscriptionPage';
 interface DashboardProps {
   children?: ReactNode;
 }
@@ -18,19 +17,25 @@ interface DashboardProps {
 export default function Dashboard({ children }: DashboardProps) {
   const [view, setView] = useState<string[]>(['noteTaking', 'overview']);
   const [isNoteTakingExpanded, setIsNoteTakingExpanded] = useState(false);
+  const [isHumanizerExpanded, setIsHumanizerExpanded] = useState(false);
   const user = useContext(UserContext);
   const router = useRouter();
   const auth = getAuth();
   const [accessCounts, setAccessCounts] = useState<{[key: string]: number}>({});
   const db = getFirestore();
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-    // Redirect if user is not defined
-    useEffect(() => {
-      if (!user) {
-        router.push('/');
-      }
-    }, [user]);
-  
+  // Redirect if user is not defined
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, [user]);
+
+  // Function to handle sidebar toggle
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   const updateAccessCount = async (component: string) => {
     if (!user) {
@@ -49,8 +54,6 @@ export default function Dashboard({ children }: DashboardProps) {
     setAccessCounts(accessCounts);
   };
 
-
-
   const renderView = () => {
     switch (view[0]) {
       case "noteTaking":
@@ -60,13 +63,14 @@ export default function Dashboard({ children }: DashboardProps) {
         switch (view[1]) {
           case "products":
             return <UserVideo darkMode={darkMode} />;
-          case "orders":
-            return <ClassPage darkMode={darkMode} />;
           default:
             return <Example darkMode={darkMode} />;
         }
       case "humanizer":
-        return <TextAnalyzerPage />;
+        if (view[1] === "orders") {
+          return <ClassPage darkMode={darkMode} />;
+        }
+        return <SubscriptionPage />;
       case "account":
         return <AccountPage darkMode={darkMode} />;
       default:
@@ -89,81 +93,115 @@ export default function Dashboard({ children }: DashboardProps) {
     setDarkMode(!darkMode);
   };
   
-  const { height, opacity, transform } = useSpring({
+  const { height: noteTakingHeight, opacity: noteTakingOpacity, transform: noteTakingTransform } = useSpring({
     from: { height: '0px', opacity: 0, transform: 'translate3d(0,-20px,0)' },
     to: {
-      height: isNoteTakingExpanded ? '100px' : '0px',
+      height: isNoteTakingExpanded ? '50px' : '0px',
       opacity: isNoteTakingExpanded ? 1 : 0,
       transform: `translate3d(0,${isNoteTakingExpanded ? 0 : -20}px,0)`,
     },
   });
+
+  const { height: humanizerHeight, opacity: humanizerOpacity, transform: humanizerTransform } = useSpring({
+    from: { height: '0px', opacity: 0, transform: 'translate3d(0,-20px,0)' },
+    to: {
+      height: isHumanizerExpanded ? '50px' : '0px',
+      opacity: isHumanizerExpanded ? 1 : 0,
+      transform: `translate3d(0,${isHumanizerExpanded ? 0 : -20}px,0)`,
+    },
+  });
+
+  useEffect(() => {
+    document.body.style.backgroundColor = darkMode ? 'rgb(52, 53, 65)' : 'white';
+
+    // clean up function to reset style when component unmounts
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [darkMode]);
   
-    return (
-      <div className={`${
-        darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'
-      } min-h-screen grid grid-cols-[16rem,1fr]`}>
+  return (
+    <div className={`${
+      darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'
+    } min-h-screen grid grid-cols-[16rem,1fr]`}>
+
+      {/* Add button to toggle sidebar on small screens */}
+      <button
+        className="md:hidden fixed top-0 right-0 m-6"
+        onClick={toggleSidebar}
+      >
+        {isSidebarOpen ? 'Close menu' : 'Open menu'}
+      </button>
+
       <aside className={`${
         darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'
-      } fixed shadow w-64 min-h-screen p-6`}>
+      } fixed shadow w-64 min-h-screen p-6 transform transition-transform duration-200 md:transform-none ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
           <h1 className={`${darkMode ? 'text-neutral-white' : 'text-primary-black'} text-2xl font-sans font-bold mb-6`}>Your Dashboard</h1>
           <nav>
           <a
             href="#"
-              onClick={() => {
-                setIsNoteTakingExpanded(!isNoteTakingExpanded); //toggle display of subitems
-                setView(['noteTaking', 'default']); //set default component
-                }}
-                className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}
-                  >
-                  <FaUsers className="mr-2" /> Automated Note-Taking
-                  </a>
-            <animated.ul style={{ overflow: 'hidden', height, opacity, transform }} className="list-disc ml-8"> {/* Bulleted list */}
-              <li className="my-2"> {/* List items */}
-                <a
-                  href="#"
-                  onClick={() => setView(['noteTaking', 'products'])}
-                  className={`${
-                    darkMode
-                      ? 'text-neutral-white border-neutral-white'
-                      : 'text-primary-black border-primary-black'
-                  } text-sm`} // Notice the additional classes for the smaller button
-                >
-                  <FaBoxOpen className="mr-2" /> Products
-                </a>
-              </li>
-              <li className="my-2">
-                <a
-                  href="#"
-                  onClick={() => setView(['noteTaking', 'orders'])}
-                  className={`${
-                    darkMode
-                      ? 'text-neutral-white border-neutral-white'
-                      : 'text-primary-black border-primary-black'
-                  } text-sm`} // Notice the additional classes for the smaller button
-                >
-                  <FaShoppingCart className="mr-2" /> Orders
-                </a>
-              </li>
-            </animated.ul>
-            <a
-              href="#"
-              onClick={() => setView(['humanizer'])}
-              className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}
+            onClick={() => {
+              setIsNoteTakingExpanded(!isNoteTakingExpanded); //toggle display of subitems
+              setView(['noteTaking', 'default']); //set default component
+              }}
+            className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block text-lg`} // Increase font size to 'lg'
             >
-              <FaDollarSign className="mr-2" /> Essay Humanizer
-            </a>
-          </nav>
+            Note-Taking
+          </a>
+          <animated.ul style={{ overflow: 'hidden', height: noteTakingHeight, opacity: noteTakingOpacity, transform: noteTakingTransform }} className="list-disc ml-8"> {/* Bulleted list */}
+            <li className="my-2"> {/* List items */}
+              <a
+                href="#"
+                onClick={() => setView(['noteTaking', 'products'])}
+                className={`${
+                  darkMode
+                    ? 'text-neutral-white border-neutral-white'
+                    : 'text-primary-black border-primary-black'
+                } text-lg`} // Increase font size to 'lg'
+              >
+                Note History
+              </a>
+            </li>
+          </animated.ul>
           <a
             href="#"
-            onClick={() => setView(['account'])} // Setting the view to 'account' when the tab is clicked
-            className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block`}
-            >
-              Account
+            onClick={() => {
+              setIsHumanizerExpanded(!isHumanizerExpanded); //toggle display of subitems
+              setView(['humanizer']); //set default component
+              }}
+            className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block text-lg`} // Increase font size to 'lg'
+          >
+            Essay Humanizer
           </a>
-        </aside>
+          <animated.ul style={{ overflow: 'hidden', height: humanizerHeight, opacity: humanizerOpacity, transform: humanizerTransform }} className="list-disc ml-8"> {/* Bulleted list */}
+            <li className="my-2"> {/* List items */}
+              <a
+                href="#"
+                onClick={() => setView(['humanizer', 'orders'])}
+                className={`${
+                  darkMode
+                    ? 'text-neutral-white border-neutral-white'
+                    : 'text-primary-black border-primary-black'
+                } text-lg`} // Increase font size to 'lg'
+              >
+                Orders
+              </a>
+            </li>
+          </animated.ul>
+        </nav>
+        <a
+          href="#"
+          onClick={() => setView(['account'])} // Setting the view to 'account' when the tab is clicked
+          className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block text-lg`} // Increase font size to 'lg'
+        >
+            Account
+        </a>
+      </aside>
       <div style={{ marginLeft: '16rem' }}> {/* Use style prop to add margin-left */}
-      <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} h-screen w-[calc(100%-16rem)] py-10 px-6 flex flex-col`}>
-        <header className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} flex items-center justify-between p-5 rounded-md mb-10`}>
+        <main className={`${darkMode ? 'bg-darker-blue' : 'bg-neutral-very-light-gray'} h-screen w-[calc(100%-16rem)] py-10 px-6 flex flex-col`}>
+          <header className={`${darkMode ? 'bg-dark-gray' : 'bg-neutral-light-grayish-blue'} flex items-center justify-between p-5 rounded-md mb-10`}>
             <h2 className="text-3xl font-sans font-bold">Welcome back!</h2>
             <div className="flex items-center justify-end">
               <button
@@ -188,4 +226,3 @@ export default function Dashboard({ children }: DashboardProps) {
     </div>
   );
 }
-

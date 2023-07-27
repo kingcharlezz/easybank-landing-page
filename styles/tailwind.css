@@ -1607,7 +1607,7 @@ select {
 }
 
 .bg-image-mockups {
-  background-image: url('/images/image-mockups.png');
+  background-image: url('/images/mockups.png');
 }
 
 .from-primary-bright-cyan {
@@ -2777,36 +2777,70 @@ body, html {
 	margin: 0;
 	padding: 0;
 }
-
 .myButton {
-	height: 50% !important;
+	height: 75% !important;
 	width: 90% !important; 
 	display: flex !important; 
 	justify-content: center !important; 
 	align-items: center !important; 
 	font-size: 1.75rem !important;
-}
-
-.myGrid {
-	display: grid !important;
-	grid-template-columns: repeat(4, 1fr) !important;
-	min-height: calc(100vh - 4rem) !important;
-	padding: 1.5rem !important;
-	gap: 2rem !important; /* add some gap between grid items */
   }
   
   .myGrid {
 	display: grid !important;
 	grid-template-columns: repeat(4, 1fr) !important;
 	min-height: calc(100vh - 4rem) !important;
-	padding: 1.5rem !important;
-	gap: 2rem !important; /* add some gap between grid items */
+	padding: 1rem !important;
+	gap: 1rem !important; /* decrease gap between grid items */
   }
   
-  .myButton:nth-child(odd) {
+  .myButton.odd {
 	background-color: rgb(37 99 235) !important; /* color for odd buttons */
   }
-
-  .myButton:nth-child(even) {
-	background-color: #00cac0 !important; /* color for odd buttons */
+  
+  .myButton.even {
+	background-color: #00cac0 !important; /* color for even buttons */
   }
+
+  .pricing-container {
+	display: flex;
+	justify-content: space-around;
+	padding: 20px;
+	height: 100vh;
+  }
+  
+  .pricing-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly; /* Distribute space evenly */
+	align-items: center;
+	background-color: #484963;
+	border-radius: 15px;
+	padding: 20px;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+	width: 30%;
+	height: 80%; /* Increase the height of each card */
+  }
+  
+  .plan-name {
+	font-size: 2.5em; /* Increase the font size */
+	margin-bottom: 20px;
+  }
+  
+  .pricing-card p, .pricing-card li {
+	font-size: 1.5em; /* Increase the font size */
+	line-height: 1.6; /* Increase the line height */
+  }
+  
+  .subscribe-button {
+	background-color: #ff4081;
+	color: white;
+	padding: 10px 20px;
+	margin-top: 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 1.5em; /* Increase the font size */
+  }
+  
+  

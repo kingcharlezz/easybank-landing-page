@@ -33,7 +33,7 @@ module.exports = {
       backgroundImage: (theme) => ({
         'header-desktop': "url('/images/bg-intro-desktop.svg')",
         'header-mobile': "url('/images/bg-intro-mobile.svg')",
-        'image-mockups': "url('/images/image-mockups.png')",
+        'image-mockups': "url('/images/mockups.png')",
       }),
       backgroundSize: {
         'custom-mobile-header-size': '100% 50%',
