@@ -69,14 +69,24 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any;
-
-      const userId = session.customer ? session.customer : '';
     
-      await db.collection('users').doc(userId).collection('accountinfo').doc('info').update({
-        paymentTier: 'premium',
-      });
+      const stripeCustomerId = session.customer ? session.customer : '';
+      
+      // Query Firestore for the user document with the matching stripeCustomerId
+      const userSnap = await db.collection('users').where('stripeCustomerId', '==', stripeCustomerId).get();
+      
+      // Ensure we found a user
+      if (!userSnap.empty) {
+        const userDoc = userSnap.docs[0];
+        
+        await userDoc.ref.collection('accountinfo').doc('info').set({
+          paymentTier: 'premium',
+        }, { merge: true });
     
-      console.log("Payment was successful. ", session);
+        console.log("Payment was successful. ", session);
+      } else {
+        console.log("No user found with the provided Stripe customer ID: ", stripeCustomerId);
+      }
     }
 
     // Include HTTP method in the response body
