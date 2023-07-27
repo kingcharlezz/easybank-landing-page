@@ -83,7 +83,7 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
     nextRes.json({ received: true, method: nextReq.method });
   } else {
     nextRes.setHeader('Allow', 'POST');
-    nextRes.status(405).end(`Method not allowed. Current method: ${nextReq.method}`);
+    nextRes.status(405).send(`Method not allowed. Current method: ${nextReq.method}`);
   }
 };
 
