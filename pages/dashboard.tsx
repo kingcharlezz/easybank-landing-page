@@ -10,6 +10,7 @@ import { useSpring, animated } from '@react-spring/web'
 import AccountPage from '../components/AccountPage';
 import ClassPage from '../components/ClassPage';
 import SubscriptionPage from '../components/SubscriptionPage';
+
 interface DashboardProps {
   children?: ReactNode;
 }

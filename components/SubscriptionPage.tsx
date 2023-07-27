@@ -18,7 +18,7 @@ const PricingPage: FC = () => {
   const stripePromise = loadStripe('pk_test_51NWlFcBvnwuagBF3TlXeR13qGtAemDvsU3xGLBntnkyBEWdeW034T9dqRJRBvsRuYq52XYV7fuyrs4D2x4SNRtCy00h71OfFRr');
 
   useEffect(() => {
-    // Firebase auth state observer
+    // Firaebase auth state observer
     const unsubscribe = onAuthStateChanged(auth, setUser);
 
     const fetchProducts = async () => {
@@ -54,7 +54,7 @@ const PricingPage: FC = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ priceId, user: user?.uid }) // include user in the body
+      body: JSON.stringify({ priceId, userId: user?.uid }) // include user in the body
     });
   
     const { sessionId } = await response.json();
