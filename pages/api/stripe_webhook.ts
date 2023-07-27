@@ -80,7 +80,7 @@ const webhookHandler = async (req: IncomingMessage, res: ServerResponse) => {
         const userDoc = userSnap.docs[0];
         
         await userDoc.ref.collection('accountinfo').doc('info').set({
-          paymentTier: 'premium',
+          paymentTier: 'Premium',
         }, { merge: true });
     
         console.log("Payment was successful. ", session);
