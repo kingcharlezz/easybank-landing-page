@@ -27,7 +27,8 @@ const db = getFirestore();
 
 
 
-// Define the incrementCounter function
+import { Timestamp } from '@firebase/firestore-types';
+
 async function incrementCounter(apiName: string) {
   const user = auth.currentUser;
 
@@ -35,30 +36,39 @@ async function incrementCounter(apiName: string) {
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     
-
     if (userDoc.exists()) {
       const userData = userDoc.data();
       const apiCounts = userData.apiCounts || {};
 
       if (apiCounts[apiName]) {
-        apiCounts[apiName] += 1;
+        // increment the count and update the timestamp
+        apiCounts[apiName].usageCount += 1;
+        apiCounts[apiName].lastUsed = Timestamp.now();  // use the firebase timestamp here
       } else {
-        apiCounts[apiName] = 1;
+        // initialize if it does not exist
+        apiCounts[apiName] = {usageCount: 1, lastUsed: Timestamp.now()};
       }
 
       console.log(`Updating user ${user.uid} with data:`, { apiCounts: apiCounts });
       await updateDoc(userRef, { apiCounts: apiCounts });
+
     } else {
-      const apiCounts = { [apiName]: 1 };
-        console.log(`Setting doc for user ${user.uid} with data:`, { apiCounts: apiCounts });
+      // create for new user
+      const apiCounts = { 
+        [apiName]: {
+          usageCount: 1, 
+          lastUsed: Timestamp.now()
+        }
+      };
+      console.log(`Setting doc for user ${user.uid} with data:`, { apiCounts: apiCounts });
       await setDoc(userRef, { apiCounts: apiCounts });
     }
+
   } else {
     // Handle case where there is no user signed in
     console.log("No user is signed in.");
   }
 }
-
 
 
 
