@@ -39,3 +39,12 @@ export const resetCounts =
   return null;
 });
 
+export const createUserDocument = functions.auth.user().onCreate((user) => {
+  const db = admin.firestore();
+  const usersRef = db.collection('users');
+  
+  return usersRef.doc(user.uid).set({
+    email: user.email,
+    // Add more fields here if needed
+  });
+});

@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     stripeCustomerId = customer.id;
 
     // Store the new Stripe customer ID in Firestore.
-    await db.collection('users').doc(userId).set({ stripeCustomerId });
+    await db.collection('users').doc(userId).set({ stripeCustomerId }, { merge: true });
   }
 
   const session = await stripe.checkout.sessions.create({

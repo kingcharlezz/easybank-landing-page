@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import {signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore"; 
+import { getFirestore } from 'firebase/firestore';
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAV6SBt7Ptnar-2ClKvlH1qyiMjb9i0r5w",
@@ -16,22 +19,29 @@ const firebaseConfig = {
 const provider = new GoogleAuthProvider();
 
 // Initialize Firebase
-initializeApp(firebaseConfig);
-const auth = getAuth();
+const app = initializeApp(firebaseConfig);
 
+// Initialize Firestore
+const db = getFirestore(app);
+
+const auth = getAuth();
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const signUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Access uid through user property of userCredential
+      const uid = userCredential.user.uid;
+      // Create a document in Firestore with the user's uid
+      await setDoc(doc(db, 'users', uid), { email: email });
       alert('User registered successfully!');
     } catch (error) {
       alert(error.message);
     }
   }
-
+  
   const logIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);

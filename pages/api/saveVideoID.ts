@@ -31,36 +31,41 @@ const db = admin.firestore();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
+    console.log('Invalid method', req.method);  // Log when the method is not POST
     return res.status(405).json({message: 'Method not allowed'});
   }
 
   const { uid, videoId } = req.body;
   if (!uid || !videoId) {
+    console.log('Missing parameters', req.body);  // Log when parameters are missing
     return res.status(400).json({message: 'Missing uid or videoId'});
   }
   
   const userRef = db.collection('users').doc(uid);
   const videoRef = userRef.collection('transcribedVideos').doc(videoId);
 
-  console.log(req.body);
+  console.log('Processing videoId for user', videoId, uid);  // Log the processing stage
 
   try {
     const userSnapshot = await userRef.get();
     if (!userSnapshot.exists) {
-      await userRef.set({}); // Create the user document if it doesn't exist
+      console.log('User does not exist, creating', uid);  // Log when creating a user
+      await userRef.set({});
     }
     const videoSnapshot = await videoRef.get();
     if (!videoSnapshot.exists) {
+      console.log('Video does not exist, creating', videoId);  // Log when creating a video
       await videoRef.set({
         videoId: videoId,
         date: admin.firestore.FieldValue.serverTimestamp() 
       });
       return res.status(200).json({message: 'Video ID successfully saved'});
     } else {
+      console.log('Video already exists', videoId);  // Log when the video already exists
       return res.status(400).json({message: 'Video ID already exists'});
     }
   } catch (err) {
-    console.error(err);
+    console.error('An error occurred', err);  // Log when an error occurs
     return res.status(500).json({message: 'Internal server error'});
   }
 }
