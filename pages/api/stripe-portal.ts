@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import admin from 'firebase-admin';
 // Initialize Firestore
 if (!admin.apps.length) {
@@ -40,9 +39,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).send({ error: 'UserId is missing' });
   }
 
-  const db = getFirestore();
-  const userDocRef = doc(db, 'users', uid);
-  const userDocSnapshot = await admin.firestore().doc(`users/${uid}`).get();
+  const db = admin.firestore();
+  const userDocSnapshot = await db.doc(`users/${uid}`).get();
 
   const stripeCustomerId = userDocSnapshot.data()?.stripeCustomerId;
 
