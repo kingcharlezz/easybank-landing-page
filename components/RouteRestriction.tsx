@@ -5,11 +5,11 @@ import { getFirestore, doc, getDoc, } from "firebase/firestore";
 const db = getFirestore();
 const auth = getAuth();
 
-type PaymentTierType = "premium" | "PremiumPlus";
+type PaymentTierType = "Premium" | "PremiumPlus";
 
 // Define the maximum route usage for each payment tier
 const MAX_API_USAGE: Record<PaymentTierType, Record<string, number>> = {
-  "premium": { "summary": 50, "fileSummary": 20 },
+  "Premium": { "summary": 50, "fileSummary": 20 },
   "PremiumPlus": { "summary": 200, "fileSummary": 50}
 }
 

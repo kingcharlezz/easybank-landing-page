@@ -20,15 +20,84 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import 'firebase/auth';
 import { getFirestore, doc, updateDoc, getDoc, setDoc, collection , addDoc  } from "firebase/firestore";
 import { v4 as uuidv4 } from 'uuid';
+import React from "react";
 const auth = getAuth();
 const db = getFirestore();
 
 
+type PaymentTierType = "Premium" | "PremiumPlus";
+interface SummaryRendererProps {
+  summary: string;
+}
+// Define the maximum route usage for each payment tier
+const MAX_API_USAGE: Record<PaymentTierType, Record<string, number>> = {
+  "Premium": { "summary": 50, "fileSummary": 20 },
+  "PremiumPlus": { "summary": 200, "fileSummary": 50}
+}
 
+export function useRouteRestriction(apiName: string) {
+  const [loading, setLoading] = useState(true);
+  const [overLimit, setOverLimit] = useState(false);
+  const [checkingApiUsage, setCheckingApiUsage] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
 
+  useEffect(() => {
+    async function checkApiUsage() {
+      setCheckingApiUsage(true);
+      const user = auth.currentUser;
+    
+      if (user && !hasChecked) {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+    
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          // Here we assert the type
+          const apiCounts: Record<string, {usageCount: number}> = userData.apiCounts || {};
+    
+          console.log("API counts:", apiCounts);
+    
+          const accountInfoRef = doc(db, "users", user.uid, "accountinfo", "info");
+          console.log("Account info ref:", accountInfoRef);
+          const accountInfoDoc = await getDoc(accountInfoRef);
+          console.log("Account info doc:", accountInfoDoc);
+    
+          if (accountInfoDoc.exists()) {
+            const accountInfoData = accountInfoDoc.data();
+            console.log("Account info data:", accountInfoData);
+            const subscriptionStatus = accountInfoData.subscriptionStatus;
+            const paymentTier = accountInfoData.paymentTier as PaymentTierType;
+    
+            // If the payment tier doesn't exist yet, use a default value
+            const selectedApiUsage: Record<string, number> = MAX_API_USAGE[paymentTier] || { "summary": 10, "fileSummary": 10 };
+    
+            // If the user has an active subscription and their API count for the specified route is over the maximum, set overLimit to true
+            const newOverLimit = subscriptionStatus === "active" && apiCounts[apiName] && apiCounts[apiName].usageCount >= selectedApiUsage[apiName];
+            if (newOverLimit !== overLimit) {
+              console.log(`API usage count for ${apiName} has exceeded the limit for the ${paymentTier} tier.`);
+              setOverLimit(newOverLimit);
+            }
+          } else {
+            console.log(`No account info found for user with ID ${user.uid}`);
+          }
+          setHasChecked(true);
+        } else {
+          console.log(`No user document found for user with ID ${user.uid}`);
+        }
+      }
+      // Add this check to set loading to false when there's no user or hasChecked is true
+      if (!user || hasChecked) {
+        setLoading(false);
+      }
+      setCheckingApiUsage(false);
+    }
+    checkApiUsage();
+  }, [hasChecked]);
 
-import { Timestamp } from '@firebase/firestore-types';
+  return { loading, overLimit, checkingApiUsage };
+}
 
+  
 async function incrementCounter(apiName: string) {
   const user = auth.currentUser;
 
@@ -43,10 +112,10 @@ async function incrementCounter(apiName: string) {
       if (apiCounts[apiName]) {
         // increment the count and update the timestamp
         apiCounts[apiName].usageCount += 1;
-        apiCounts[apiName].lastUsed = Timestamp.now();  // use the firebase timestamp here
+        
       } else {
         // initialize if it does not exist
-        apiCounts[apiName] = {usageCount: 1, lastUsed: Timestamp.now()};
+        apiCounts[apiName] = {usageCount: 1};
       }
 
       console.log(`Updating user ${user.uid} with data:`, { apiCounts: apiCounts });
@@ -56,8 +125,7 @@ async function incrementCounter(apiName: string) {
       // create for new user
       const apiCounts = { 
         [apiName]: {
-          usageCount: 1, 
-          lastUsed: Timestamp.now()
+          usageCount: 1,
         }
       };
       console.log(`Setting doc for user ${user.uid} with data:`, { apiCounts: apiCounts });
@@ -79,6 +147,8 @@ export default function Example({ darkMode }: ExampleProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const classRef = useRef<HTMLInputElement>(null);
   const [uid, setUid] = useState("");
+  const summaryRestriction = useRouteRestriction('summary');
+  const fileSummaryRestriction = useRouteRestriction('fileSummary');
   
 
   const [loading, setLoading] = useState(false);
@@ -168,8 +238,17 @@ const handleClassInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   );
 }
   
-const generateSummary = async (e: any) => {
+const generateSummary = async (e: any, overLimit: boolean, loading: boolean, checkingApiUsage: boolean) => {
   e.preventDefault();
+
+  if (loading || checkingApiUsage) {
+    // Handle loading state, e.g., show loading spinner
+    toast.info("Checking your usage limits. Please wait...");
+    return;
+  } else if (overLimit) {
+    toast.error("You have reached your usage limit for generating summaries. Please try again later.");
+    return;
+  }
 
   if (!urlRef.current) {
     toast.error("Please enter a valid youtube url");
@@ -301,8 +380,17 @@ const generateSummary = async (e: any) => {
   incrementCounter('summary'); // Add this line
 };
 
-  const generateFileSummary = async (e: any) => {
-    e.preventDefault();
+  const generateFileSummary = async (e: any, overLimit: boolean, loading: boolean, checkingApiUsage: boolean) => {
+  e.preventDefault();
+
+  if (loading || checkingApiUsage) {
+    // Handle loading state, e.g., show loading spinner
+    toast.info("Checking your usage limits. Please wait...");
+    return;
+  } else if (overLimit) {
+    toast.error("You have reached your usage limit for generating summaries from files. Please try again later.");
+    return;
+  }
   
     if (!fileRef.current) {
       toast.error("Please upload a file");
@@ -331,8 +419,8 @@ const generateSummary = async (e: any) => {
     formData.append("model", "tiny");
     formData.append("use_sse", "true");
     formData.append("file", currentFile);
-    const videoID = uuidv4();
-    formData.append("url", videoID);
+    const videoId = uuidv4();
+    formData.append("url", videoId);
 
     try {
       const responseVideoID = await fetch("/api/saveVideoID", {
@@ -341,14 +429,13 @@ const generateSummary = async (e: any) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          videoID: videoID,
+          videoId: videoId,
           uid: uid,
         }),
       });
 
       if (!responseVideoID.ok) {
-        toast.success("Video ID Already Saved");
-        setLoading(false);
+        toast.success("Video Re. Please allow time for the file to be sent.");
         throw new Error(responseVideoID.statusText);
       }
     } catch (err) {
@@ -442,7 +529,7 @@ const generateSummary = async (e: any) => {
       setLoading(false);
       console.log("Summary completed!", summary);
     }
-    incrementCounter('summary'); // Add this line
+    incrementCounter('fileSummary'); // Add this line
   };
 
   const handleProcessing = () => {
@@ -452,9 +539,9 @@ const generateSummary = async (e: any) => {
     const syntheticEvent = { preventDefault: () => {} }; // Create a synthetic event
   
     if (url) {
-      generateSummary(syntheticEvent);
+      generateSummary(syntheticEvent, summaryRestriction.overLimit, summaryRestriction.loading, summaryRestriction.checkingApiUsage);
     } else if (file) {
-      generateFileSummary(syntheticEvent);
+      generateFileSummary(syntheticEvent, fileSummaryRestriction.overLimit, fileSummaryRestriction.loading, fileSummaryRestriction.checkingApiUsage);
     } else {
       toast.error("Please enter a YouTube URL or choose a file to upload.");
     }
@@ -587,6 +674,22 @@ const generateSummary = async (e: any) => {
   };
 */
 
+const SummaryRenderer = React.memo(({ summary }: SummaryRendererProps) => (
+  <ReactMarkdown
+    components={{
+      a: LinkRenderer,
+      h1: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
+      h2: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
+      h3: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />, 
+      p: ({ node, ...props }) => <p {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
+    }}
+  >
+    {"> Heres a tip! Click the # to jump to the timestamp.\n" +
+      summary +
+      "\n"}
+  </ReactMarkdown>
+));
+
   return (
     <div className={`flex flex-col text-center ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
       <div className={darkMode ? 'text-neutral-white border-neutral-white bg-darker-blue' : 'text-primary-black border-primary-black bg-white'}>
@@ -673,19 +776,7 @@ const generateSummary = async (e: any) => {
             <article className={`prose prose-red w-full border-red-100 mx-auto px-3 lg:px-0 ${darkMode ? 'text-neutral-white bg-darker-blue' : 'text-primary-black bg-white'}`}>
             <div className="parent-component" style={{display: 'outside', justifyContent: 'center', overflow: 'hidden'}}>
                 <div className="summary-output" style={{textAlign: 'justify'}}>
-              <ReactMarkdown
-                components={{
-                  a: LinkRenderer,
-                  h1: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
-                  h2: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
-                  h3: ({ node, ...props }) => <h2 {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />, 
-                  p: ({ node, ...props }) => <p {...props} className={darkMode ? 'text-neutral-white' : 'text-primary-black'} />,
-                }}
-              >
-                {"> Heres a tip! Click the # to jump to the timestamp.\n" +
-                  summary +
-                  "\n"}
-              </ReactMarkdown>
+                <SummaryRenderer summary={summary} />
               </div>
             </div>
             </article>
