@@ -68,9 +68,9 @@ const handleCheckoutSessionCompleted = async (session: Session) => {
     const userDoc = userSnap.docs[0];
     let paymentTier: string | undefined;
     
-    if (session.amount_subtotal === 499) {
+    if (session.amount_subtotal === 500) {
       paymentTier = 'Premium';
-    } else if (session.amount_subtotal === 999) {
+    } else if (session.amount_subtotal === 1000) {
       paymentTier = 'PremiumPlus';
     }
 
