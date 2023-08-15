@@ -69,7 +69,7 @@ export function useRouteRestriction(apiName: string) {
             const paymentTier = accountInfoData.paymentTier as PaymentTierType;
     
             // If the payment tier doesn't exist yet, use a default value
-            const selectedApiUsage: Record<string, number> = MAX_API_USAGE[paymentTier] || { "summary": 10, "fileSummary": 10 };
+            const selectedApiUsage: Record<string, number> = MAX_API_USAGE[paymentTier] || { "summary": 10, "fileSummary": 3 };
     
             // If the user has an active subscription and their API count for the specified route is over the maximum, set overLimit to true
             const newOverLimit = subscriptionStatus === "active" && apiCounts[apiName] && apiCounts[apiName].usageCount >= selectedApiUsage[apiName];
@@ -146,9 +146,11 @@ export default function Example({ darkMode }: ExampleProps) {
   const urlRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const classRef = useRef<HTMLInputElement>(null);
+  const videoNameRef = useRef<HTMLInputElement>(null);
   const [uid, setUid] = useState("");
   const summaryRestriction = useRouteRestriction('summary');
   const fileSummaryRestriction = useRouteRestriction('fileSummary');
+  const [videoName, setVideoName] = useState("")
   
 
   const [loading, setLoading] = useState(false);
@@ -298,15 +300,24 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
     } catch (error) {
       console.error("Error writing document: ", error);
     }
+
+    type VideoRequest = {
+      videoId: string | null;
+      uid: string;
+      videoName?: string; // Marking videoName as optional
+    };
+    
+    const requestBody: VideoRequest = {
+      videoId: videoId,
+      uid: uid,
+    };
+    
     const responseVideoID = await fetch("/api/saveVideoID", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        videoId: videoId,
-        uid: uid,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!responseVideoID.ok) {
@@ -431,6 +442,7 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
         body: JSON.stringify({
           videoId: videoId,
           uid: uid,
+          videoName: videoName,
         }),
       });
 
@@ -457,7 +469,7 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
       setLoading(false);
       throw new Error(errorMessage);
     } else {
-      toast.success("Generating Summary!");
+      toast.success("Video Recieved. Please allow time for the file to be sent.");
     }
     
     const className = classRef.current?.value;  // Make sure to create this ref
@@ -534,9 +546,15 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
 
   const handleProcessing = () => {
     const url = urlRef.current?.value;
-    const file = fileRef.current?.files?.[0]; // add null check with optional chaining
+    const file = fileRef.current?.files?.[0];
+    const videoNameValue = videoNameRef.current?.value;
   
-    const syntheticEvent = { preventDefault: () => {} }; // Create a synthetic event
+    const syntheticEvent = { preventDefault: () => {} };
+  
+    if (file && !videoNameValue) {
+      toast.error("Please provide a video name for the uploaded file.");
+      return;
+    }
   
     if (url) {
       generateSummary(syntheticEvent, summaryRestriction.overLimit, summaryRestriction.loading, summaryRestriction.checkingApiUsage);
@@ -754,6 +772,22 @@ const SummaryRenderer = React.memo(({ summary }: SummaryRendererProps) => (
                   {suggestion}
                 </div>
               ))}
+              <div className="relative">
+                <label htmlFor="videoName" className={`absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium ${darkMode ? 'text-gray-900' : 'text-gray-900'}`}>
+                  Video Name
+                </label>
+                <input
+                  type="text"
+                  name="videoName"
+                  id="videoName"
+                  ref={videoNameRef}
+                  size={40}
+                  className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-gray-900' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
+                  placeholder="Enter Video Name"
+                  value={videoName}
+                  onChange={(e) => setVideoName(e.target.value)}
+                />
+              </div>
               </div>
                 <button
                   onClick={handleProcessing}

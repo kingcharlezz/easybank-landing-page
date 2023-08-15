@@ -35,8 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({message: 'Method not allowed'});
   }
 
-  const { uid, videoId } = req.body;
-  if (!uid || !videoId) {
+  const { uid, videoId, videoName } = req.body; // Include videoName here, but it's optional
+  if (!uid || !videoId) { // No need to check for videoName
     console.log('Missing parameters', req.body);  // Log when parameters are missing
     return res.status(400).json({message: 'Missing uid or videoId'});
   }
@@ -57,9 +57,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log('Video does not exist, creating', videoId);  // Log when creating a video
       await videoRef.set({
         videoId: videoId,
+        videoName: videoName || null, // Include videoName here, but it's optional
         date: admin.firestore.FieldValue.serverTimestamp() 
       });
-      return res.status(200).json({message: 'Video ID successfully saved'});
+      return res.status(200).json({message: 'Video ID and name successfully saved'});
     } else {
       console.log('Video already exists', videoId);  // Log when the video already exists
       return res.status(400).json({message: 'Video ID already exists'});
