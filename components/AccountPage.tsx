@@ -14,7 +14,27 @@ interface AccountInfo {
 
 const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
+  const [usageCounts, setUsageCounts] = useState<{ summary: number; fileSummary: number } | null>(null);
   const auth = getAuth();
+
+  const fetchApiUsageCounts = async () => {
+    const user = auth.currentUser;
+
+    if (user) {
+      const db = getFirestore();
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const apiCounts: Record<string, { usageCount: number }> = userData?.apiCounts || {};
+        setUsageCounts({
+          summary: apiCounts.summary?.usageCount || 0,
+          fileSummary: apiCounts.fileSummary?.usageCount || 0,
+        });
+      }
+    }
+  };
 
   const createAccountInfoDocument = async (uid: string, email: string, paymentTier: string) => {
     console.log(`Creating account info document for uid: ${uid}, email: ${email}`);  // Check if function is being called and log values
@@ -68,6 +88,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
   };
 
   useEffect(() => {
+    fetchApiUsageCounts();
     document.body.className = darkMode ? 'body-dark' : 'body-light';
     const user: User | null = auth.currentUser;
 
@@ -92,25 +113,39 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
   }, [darkMode]);
 
   return (
-    <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'} p-4`}>
-      {accountInfo ? (
-        <div className={`rounded-lg shadow-md p-6 ${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-white text-gray-900'}`}>
-          <h2 className="text-3xl font-bold mb-4">Account Details</h2>
-          <div className="mb-6">
-            <span className="font-medium">Payment Tier:</span> {accountInfo.paymentTier}
+      <div className={`container mx-auto mt-10 p-4 ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
+        <div className={`rounded-lg shadow-lg p-6 text-center ${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-white text-gray-900'}`}>
+          <h2 className="text-4xl font-bold mb-6">Account Details</h2>
+          {usageCounts && (
+            <div className="mb-6 text-lg">
+              <p>Regular Summary Usage Count : {usageCounts.summary}</p>
+              <p>File Summary Usage Count : {usageCounts.fileSummary}</p>
+            </div>
+          )}
+        {accountInfo ? (
+          <div>
+            <div className="mb-6 text-lg">
+              <span className="font-medium">Email:</span> {accountInfo.email}
+            </div>
+            <div className="mb-6 text-lg">
+              <span className="font-medium">Payment Tier:</span> {accountInfo.paymentTier}
+            </div>
+            <div className="text-center">
+              <button 
+                onClick={() => goToStripePortal()}   
+                className={`bg-blue-600 text-white rounded-full hover:bg-blue-700 ${darkMode ? 'shadow-md' : ''}`}
+                style={{ fontSize: '24px', padding: '16px 32px' }}
+              >
+                Go to Stripe Portal
+              </button>
+            </div>
           </div>
-          <button 
-            onClick={() => goToStripePortal()}   
-            className={`bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${darkMode ? 'shadow-md' : ''}`}
-          >
-            Go to Stripe Portal
-          </button>
-        </div>
-      ) : (
-        <div className={`flex justify-center items-center h-60 ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
-          <div className={`spinner ${darkMode ? 'text-neutral-white' : 'text-gray-900'}`}></div>
-        </div>
-      )}
+        ) : (
+          <div className={`flex justify-center items-center h-60 ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
+            <div className={`spinner ${darkMode ? 'text-neutral-white' : 'text-gray-900'}`}></div>
+          </div>
+        )}
+      </div>
       <style jsx>{`
         .spinner {
           border: 5px solid transparent;

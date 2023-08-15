@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getAuth, User } from 'firebase/auth';
 import { doc, getDocs, collection, getFirestore } from 'firebase/firestore';
 import { DocumentData } from 'firebase/firestore';
 import Link from 'next/link';
-
+import { getAuth, User } from 'firebase/auth';
 interface MyComponentProps {
     darkMode: boolean;
 }
@@ -19,8 +18,12 @@ interface Video {
 const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
     const [videos, setVideos] = useState<Video[]>([]);
 
-    // Fetch video title from YouTube Data API
-    const getVideoTitle = async (videoId: string) => {
+    // Modified function to first check videoName from Firestore
+    const getVideoTitle = async (videoId: string, videoName?: string) => {
+        if (videoName) {
+            return videoName;
+        }
+    
         const response = await axios.get(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=AIzaSyAV6SBt7Ptnar-2ClKvlH1qyiMjb9i0r5w`);
         if (response.data.items[0]) {
             return response.data.items[0].snippet.title;
@@ -28,11 +31,11 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
             return "No title found";
         }
     };
+    
 
     useEffect(() => {
-        // Add this to change body class based on darkMode state
         document.body.className = darkMode ? 'body-dark' : 'body-light';
-
+    
         const auth = getAuth();
         const user: User | null = auth.currentUser;
         
@@ -40,14 +43,18 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
             const db = getFirestore();
             const userDoc = doc(db, 'users', user.uid);
             const videoCollection = collection(userDoc, 'transcribedVideos');
-
+    
             getDocs(videoCollection).then(async (videoSnapshot) => {
                 const fetchedVideos: Video[] = await Promise.all(videoSnapshot.docs.map(async (doc: DocumentData) => {
                     const videoId = doc.data().videoId;
-                    const title = await getVideoTitle(videoId);
+                    const videoName = doc.data().videoName; // Get videoName from the Firestore document
+                    const title = await getVideoTitle(videoId, videoName); // Pass videoName as a second argument
                     const date = new Date(doc.data().date.seconds * 1000);  
                     return { videoId: videoId, title: title, date: date };
                 }));
+    
+                // Sort videos by date, from newest to oldest
+                fetchedVideos.sort((a, b) => b.date.getTime() - a.date.getTime());
                 setVideos(fetchedVideos);
             }).catch((error: any) => {
                 console.log('Error getting document:', error);
@@ -55,7 +62,7 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
         } else {
             console.log("No user is signed in.");
         }
-    }, [darkMode]);  // Add darkMode to the dependency array
+    }, [darkMode]);
 
     if (videos.length > 0) {
         return (

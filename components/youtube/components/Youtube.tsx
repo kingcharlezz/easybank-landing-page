@@ -9,7 +9,7 @@ export default function Youtube(props: { url: string; ts: Number }) {
   const videoId = extractVideoId(url);
 
   if (videoId === null) {
-    return <div>Invalid youtube url</div>;
+    return <div></div>;
   }
 
   return (

@@ -68,14 +68,14 @@ export default function Dashboard({ children }: DashboardProps) {
             return <Example darkMode={darkMode} />;
         }
       case "humanizer":
-        if (view[1] === "orders") {
+        if (view[1] === "account") {
           return <ClassPage darkMode={darkMode} />;
         }
         return <SubscriptionPage />;
       case "account":
         return <AccountPage darkMode={darkMode} />;
       default:
-        return <Example darkMode={darkMode} />;
+        return <ClassPage darkMode={darkMode} />;
     }
   };
 
@@ -174,30 +174,30 @@ export default function Dashboard({ children }: DashboardProps) {
               }}
             className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block text-lg`} // Increase font size to 'lg'
           >
-            Essay Humanizer
+            Account Subscription
           </a>
-          <animated.ul style={{ overflow: 'hidden', height: humanizerHeight, opacity: humanizerOpacity, transform: humanizerTransform }} className="list-disc ml-8"> {/* Bulleted list */}
+          <animated.ul style={{ overflow: 'visible', height: humanizerHeight, opacity: humanizerOpacity, transform: humanizerTransform }} className="list-disc ml-8"> {/* Bulleted list */}
             <li className="my-2"> {/* List items */}
               <a
                 href="#"
-                onClick={() => setView(['humanizer', 'orders'])}
+                onClick={() => setView(['account', 'account'])}
                 className={`${
                   darkMode
                     ? 'text-neutral-white border-neutral-white'
                     : 'text-primary-black border-primary-black'
                 } text-lg`} // Increase font size to 'lg'
               >
-                Orders
+                Account Settings
               </a>
             </li>
           </animated.ul>
         </nav>
         <a
           href="#"
-          onClick={() => setView(['account'])} // Setting the view to 'account' when the tab is clicked
+          onClick={() => setView(['orders'])} // Setting the view to 'account' when the tab is clicked
           className={`${darkMode ? 'text-neutral-white border-neutral-white' : 'text-primary-black border-primary-black'} mb-4 border-2 hover:text-dark-blue rounded p-3 transition-colors duration-200 block text-lg`} // Increase font size to 'lg'
         >
-            Account
+            Your Classes
         </a>
       </aside>
       <div style={{ marginLeft: '16rem' }}> {/* Use style prop to add margin-left */}
