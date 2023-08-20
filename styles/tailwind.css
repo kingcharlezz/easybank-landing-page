@@ -2819,7 +2819,6 @@ body, html {
 	flex-direction: column;
 	justify-content: space-evenly; /* Distribute space evenly */
 	align-items: center;
-	background-color: #484963;
 	border-radius: 15px;
 	padding: 20px;
 	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
