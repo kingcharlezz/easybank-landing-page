@@ -43,7 +43,7 @@ const MarkdownPage: React.FC = () => {
     <div className="w-full min-h-screen">
       <div className="prose prose-lg max-w-full mx-auto my-12">
         <div className={`flex flex-col items-center justify-center min-h-screen py-2 px-4 ${darkMode ? 'bg-darker-blue text-neutral-white' : 'bg-white text-gray-900'}`}>
-          <h1 className={`mt-12 text-4xl font-bold tracking-tight ${darkMode ? 'text-neutral-white' : 'text-gray-900'} sm:mt-10 sm:text-6xl`}>Markdown Content:</h1>
+          <h1 className={`mt-12 text-4xl font-bold tracking-tight ${darkMode ? 'text-neutral-white' : 'text-gray-900'} sm:mt-10 sm:text-6xl`}>Your Notes:</h1>
           <div className="w-auto max-w-2xl mx-auto mt-8">
             <ReactMarkdown>
               {markdown}

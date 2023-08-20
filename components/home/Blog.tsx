@@ -17,7 +17,7 @@ const articles = [
   },
   {
     author: 'By Wilson Hutton',
-    title: 'Take your Easybank card wherever you go',
+    title: 'Take your NoteScribe card wherever you go',
     description:
       'We want you to enjoy your travels. This is why we don’t charge any fees on purchases while you’re abroad. We’ll even show you …',
     imgPath: '/images/image-plane.jpg',

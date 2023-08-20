@@ -11,27 +11,27 @@ export default function Navbar() {
       <div className="fixed z-50 top-0 w-full bg-white">
         <nav className="container flex justify-between items-center z-20">
           <div className="my-5 lg:my-6">
-            <img src="images/notescribe.png" alt="notescribe logo" />
+            <img src="images/notescribeold.png" alt="notescribe logo"style={{ width: '185px', height: '39px' }} />
           </div>
 
           <div className="hidden lg:flex text-lg font-bold text-neutral-black ">
             {navItems.map((navItem, index) => (
-              <a key={index} className="mx-3 py-5 hover:gradient-border-bottom" href="#">
-                {navItem}
-              </a>
+              <Link key={index} href={`/${navItem === 'Home' ? '' : navItem.toLowerCase()}`}>
+                <span className="mx-3 py-5 hover:gradient-border-bottom">{navItem}</span>
+              </Link>
             ))}
           </div>
 
           <div className="hidden lg:flex">
             <Link href="../login">
-              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>
+              <span style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>
                 Login
-              </button>
+              </span>
             </Link>
             <Link href="../signup">
-              <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#444', cursor: 'pointer' }}>
+              <span style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#444', cursor: 'pointer' }}>
                 Signup
-              </button>
+              </span>
             </Link>
           </div>
 
@@ -60,9 +60,9 @@ export default function Navbar() {
       >
         <div className="bg-white text-primary-black flex flex-col text-center mx-5 my-20 py-4 rounded">
           {navItems.map((navItem, index) => (
-            <a key={index} className="py-2" href="#">
-              {navItem}
-            </a>
+            <Link key={index} href={`/${navItem === 'Home' ? '' : navItem.toLowerCase()}`}>
+              <span className="py-2">{navItem}</span>
+            </Link>
           ))}
         </div>
       </div>

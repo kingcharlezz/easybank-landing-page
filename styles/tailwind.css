@@ -1576,7 +1576,12 @@ select {
 .bg-primary-dark-blue {
 	--tw-bg-opacity: 1;
 
-	background-color: hsl(204deg 74% 46% / var(--tw-bg-opacity));
+	background-color: hsl(212deg 100% 50% / var(--tw-bg-opacity));
+}
+
+.bg-primary-indigo {
+	--tw-bg-opacity: 1;
+	background-color: hsl(231deg, 23%, 24%) !important;
 }
 
 .bg-primary-lime-green {
@@ -2833,7 +2838,7 @@ body, html {
   }
   
   .subscribe-button {
-	background-color: #ff4081;
+	background-color: #0077FF;
 	color: white;
 	padding: 10px 20px;
 	margin-top: 20px;

@@ -12,9 +12,7 @@ export default function Hero() {
             Revolutionize your learning 
             </h1>
             <p className="text-neutral-black text-lg lg:text-base leading-5 mb-7">
-            The Student Ally AI Suite will be your one-stop solution for automated note taking, rewriting AI-composed essays to avoid detection, 
-            and answering course-specific questions, plus so much more.
-            </p>
+            Discover NoteScribe, an AI-powered platform that revolutionizes learning by converting uploaded files and YouTube videos into comprehensive notes, making the need to physically attend classes a thing of the past. With NoteScribe, students can enjoy an enriched, flexible learning journey right from the comfort of their home, breaking away from traditional classroom constraints            </p>
             <div className="flex justify-between">
               <Link href="../login">
                 <button style={{ padding: '0.5rem 1rem', border: 'none', borderRadius: '0.25rem', fontSize: '1.25rem', fontWeight: 'normal', color: '#fff', backgroundColor: '#0077ff', cursor: 'pointer', marginRight: '1rem' }}>

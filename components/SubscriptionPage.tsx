@@ -17,8 +17,16 @@ const PricingPage: FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const stripePromise = loadStripe('pk_test_51NWlFcBvnwuagBF3TlXeR13qGtAemDvsU3xGLBntnkyBEWdeW034T9dqRJRBvsRuYq52XYV7fuyrs4D2x4SNRtCy00h71OfFRr');
 
+  // Define a mapping of product names to features
+  const productFeatures: { [key: string]: string[] } = {
+    'Free Plan': ['10 Youtube Videos Notes Per Month', '3 Uploaded Files Notes Per Month', 'No Access to AI Humanizer(Coming Soon)'],
+    'Premium Plan': ['50 Youtube Videos Notes Per Month', '20 Uploaded Files Notes Per Month', 'Access to AI Humanizer  (Coming Soon)'],
+    'PremiumPlus Plan': ['200 Youtube Videos Notes Per Month', '50 Uploaded Files Notes Per Month', 'Access to AI Humanizer(Coming Soon)'],
+    // Add more plans and features as needed
+  };
+
   useEffect(() => {
-    // Firaebase auth state observer
+    // Firebase auth state observer
     const unsubscribe = onAuthStateChanged(auth, setUser);
 
     const fetchProducts = async () => {
@@ -32,14 +40,15 @@ const PricingPage: FC = () => {
           products.push({
             name: productData.name,
             price: priceData.unit_amount,
-            priceId: priceDoc.id, // Use the document ID as the priceId
+            priceId: priceDoc.id,
           } as Product);
         }
       }
       setProducts(products);
     };
-    
+
     fetchProducts();
+
 
     // Clean up subscription
     return () => unsubscribe();
@@ -80,26 +89,26 @@ const PricingPage: FC = () => {
       <div className="pricing-card">
         <h2 className="plan-name">Free Plan</h2>
         <p>$0 per month</p>
-        <ul>
-          <li>Feature 1</li>
-          <li>Feature 2</li>
-          <li>Feature 3</li>
+        <ul style={{ listStyleType: 'none' }}>
+          {productFeatures['Free Plan'].map((feature, index) => (
+            <li key={index} style={{ textAlign: 'center', fontSize: '1.4em', margin: '10px 0' }}>{feature}</li>
+          ))}
         </ul>
       </div>
       {products.map((product) => (
         <div className="pricing-card" key={product.priceId}>
           <h2 className="plan-name">{product.name}</h2>
           <p>${product.price / 100} per month</p>
-          <ul>
-            <li>Feature 1</li>
-            <li>Feature 2</li>
-            <li>Feature 3</li>
+          <ul style={{ listStyleType: 'none' }}>
+            {productFeatures[product.name]?.map((feature, index) => (
+              <li key={index} style={{ textAlign: 'center', fontSize: '1.4em', margin: '10px 0' }}>{feature}</li>
+            ))}
           </ul>
           <button className="subscribe-button" onClick={() => handleClick(product.priceId)}>Subscribe</button>
         </div>
       ))}
     </div>
-  );
+  );  
 };
 
 export default PricingPage;

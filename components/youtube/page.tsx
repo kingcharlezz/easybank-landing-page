@@ -40,7 +40,7 @@ export function useRouteRestriction(apiName: string) {
   const [overLimit, setOverLimit] = useState(false);
   const [checkingApiUsage, setCheckingApiUsage] = useState(true);
   const [hasChecked, setHasChecked] = useState(false);
-
+  
   useEffect(() => {
     async function checkApiUsage() {
       setCheckingApiUsage(true);

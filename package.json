@@ -1,5 +1,5 @@
 {
-  "name": "easybank-landing-page",
+  "name": "NoteScribe-landing-page",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -37,6 +37,10 @@
     "typescript": "^4.9.5"
   },
   "devDependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.3",
+    "@mui/material": "^5.14.5",
     "@stripe/stripe-js": "^1.54.1",
     "@tailwindcss/aspect-ratio": "latest",
     "@tailwindcss/forms": "latest",

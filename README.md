@@ -1,6 +1,6 @@
 ## View project
 
-[easybank-web.vercel.app](https://easybank-web.vercel.app/)
+[NoteScribe-web.vercel.app](https://NoteScribe-web.vercel.app/)
 
 ## About the project
 
@@ -14,7 +14,7 @@ Fully responsive SAAS product landing page designed with Tailwind CSS. Made as p
 
 ## Screenshot
 
-![easybank](https://user-images.githubusercontent.com/4708484/110999705-2ae55c80-8357-11eb-97bf-94cf3aea198a.jpg)
+![NoteScribe](https://user-images.githubusercontent.com/4708484/110999705-2ae55c80-8357-11eb-97bf-94cf3aea198a.jpg)
 
 ## Core dependencies
 
