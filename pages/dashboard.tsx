@@ -71,7 +71,7 @@ export default function Dashboard({ children }: DashboardProps) {
         if (view[1] === "account") {
           return <ClassPage darkMode={darkMode} />;
         }
-        return <SubscriptionPage />;
+        return <SubscriptionPage darkMode={darkMode} />;
       case "account":
         return <AccountPage darkMode={darkMode} />;
       default:
