@@ -11,7 +11,7 @@ export default function Navbar() {
       <div className="fixed z-50 top-0 w-full bg-white">
         <nav className="container flex justify-between items-center z-20">
           <div className="my-5 lg:my-6">
-            <img src="images/NotescribeOld.png" alt="notescribe logo"style={{ width: '185px', height: '39px' }} />
+            <img src="images/NoteScribeOld.png" alt="notescribe logo"style={{ width: '185px', height: '39px' }} />
           </div>
 
           <div className="hidden lg:flex text-lg font-bold text-neutral-black ">
