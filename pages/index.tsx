@@ -7,7 +7,7 @@ import Footer from '../components/layout/Footer';
 
 const Home: NextPage = () => {
   useEffect(() => {
-    document.body.style.backgroundColor = 'white';
+    document.body.style.backgroundColor = '';
   }, []);
 
   return (
