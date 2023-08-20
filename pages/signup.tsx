@@ -33,7 +33,7 @@ export default function Signup() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-white text-primary-black">
       <Navbar />
       <div className="flex flex-col space-y-6 w-80 mt-20 mb-10">
-      <h1 className="text-3xl font-bold text-center">Sign up</h1>
+      <h1 className="text-3xl font-bold">Sign up</h1>
 
         <input 
           type="email" 
@@ -63,10 +63,11 @@ export default function Signup() {
         >
           Sign up with Google
         </button>
-
+        <div className="text-center">
         <Link href="/login">
-            <span className="text-center-underline">Already have an account? Login</span>
+            <span className="pwlink">Already have an account? Login</span>
         </Link>
+        </div>
       </div>
     </div>
   );

@@ -2826,6 +2826,7 @@ body, html {
 	width: 30%;
 	height: 80%; /* Increase the height of each card */
   }
+
   
   .plan-name {
 	font-size: 2.5em; /* Increase the font size */
@@ -2848,4 +2849,10 @@ body, html {
 	font-size: 1.5em; /* Increase the font size */
   }
   
+  .pwlink {
+	text-align: center !important;
+	color: #000000 !important; /* Replace this with the specific color code you want for "primary-black" */
+	text-decoration: underline !important;
+	cursor: pointer !important;
+  }
   

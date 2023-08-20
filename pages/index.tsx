@@ -5,6 +5,7 @@ import Hero from '../components/home/Hero';
 import Motivation from '../components/home/Motivation';
 
 import Footer from '../components/layout/Footer';
+document.body.style.backgroundColor = 'white';
 
 const Home: NextPage = () => {
   return (

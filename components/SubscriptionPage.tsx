@@ -11,8 +11,11 @@ interface Product {
   price: number;
   priceId: string;
 }
+interface MyComponentProps {
+  darkMode: boolean;
+}
 
-const PricingPage: FC = () => {
+const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const stripePromise = loadStripe('pk_test_51NWlFcBvnwuagBF3TlXeR13qGtAemDvsU3xGLBntnkyBEWdeW034T9dqRJRBvsRuYq52XYV7fuyrs4D2x4SNRtCy00h71OfFRr');
@@ -83,10 +86,13 @@ const PricingPage: FC = () => {
       console.error(error);
     }
   };
-
+  const pricingCardStyle = {
+    backgroundColor: darkMode ? '#484963' : 'transparent' // Set to transparent in light mode
+  };
+  
   return (
     <div className="pricing-container">
-      <div className="pricing-card">
+       <div className="pricing-card" style={pricingCardStyle}>
         <h2 className="plan-name">Free Plan</h2>
         <p>$0 per month</p>
         <ul style={{ listStyleType: 'none' }}>
@@ -96,7 +102,7 @@ const PricingPage: FC = () => {
         </ul>
       </div>
       {products.map((product) => (
-        <div className="pricing-card" key={product.priceId}>
+         <div className="pricing-card" style={pricingCardStyle} key={product.priceId}>
           <h2 className="plan-name">{product.name}</h2>
           <p>${product.price / 100} per month</p>
           <ul style={{ listStyleType: 'none' }}>

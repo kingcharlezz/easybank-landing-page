@@ -17,6 +17,7 @@ interface Video {
 
 const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
     const [videos, setVideos] = useState<Video[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Modified function to first check videoName from Firestore
     const getVideoTitle = async (videoId: string, videoName?: string) => {
@@ -56,15 +57,22 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
                 // Sort videos by date, from newest to oldest
                 fetchedVideos.sort((a, b) => b.date.getTime() - a.date.getTime());
                 setVideos(fetchedVideos);
+                setIsLoading(false); // Set loading to false after fetching videos
             }).catch((error: any) => {
                 console.log('Error getting document:', error);
             });
         } else {
             console.log("No user is signed in.");
+            setIsLoading(false); // Set loading to false if no user is signed in
         }
     }, [darkMode]);
-
-    if (videos.length > 0) {
+    if (isLoading) {
+        return (
+            <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'} px-4 py-6`}>
+                <h1 className={`mt-12 text-4xl font-bold tracking-tight ${darkMode ? 'text-neutral-white' : 'text-gray-900'} sm:mt-10 sm:text-6xl`}>Loading...</h1>
+            </div>
+        );
+        }else if (videos.length > 0) {
         return (
           <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'} px-4 py-6`}>
             {videos.map((video: Video, index: number) => (
@@ -84,10 +92,12 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
             ))}
           </div>
         );
-      } else {
+    } else {
         return (
             <div className={`flex flex-col ${darkMode ? 'bg-darker-blue' : 'bg-white'} px-4 py-6`}>
-                <h1 className={`mt-12 text-4xl font-bold tracking-tight ${darkMode ? 'text-neutral-white' : 'text-gray-900'} sm:mt-10 sm:text-6xl`}>Loading...</h1>
+                <h1 className="col-span-4 text-center mt-12 text-4xl font-bold tracking-tight">
+                    No notes found, please input a video in the note-taking section for your notes to show up here.
+                </h1>
             </div>
         );
     }

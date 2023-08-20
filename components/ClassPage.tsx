@@ -10,7 +10,7 @@ interface MyComponentProps {
 const ClassFolders: React.FC<MyComponentProps> = ({ darkMode }) => {
   const [allClassData, setAllClassData] = useState<any[]>([]);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -27,6 +27,7 @@ const ClassFolders: React.FC<MyComponentProps> = ({ darkMode }) => {
           classesData.push({ className, videoIds });
         }
         setAllClassData(classesData);
+        setIsLoading(false); // Set loading to false after fetching class data
       });
     }
   }, []);
@@ -56,7 +57,16 @@ const ClassFolders: React.FC<MyComponentProps> = ({ darkMode }) => {
     };
   }, [darkMode]);
 
-  return (
+  if (isLoading) {
+    return (
+      <div>
+        <h1 className="col-span-4 text-center mt-12 text-4xl font-bold tracking-tight">
+          Loading...
+        </h1>
+      </div>
+    );
+  } else if (allClassData.length > 0) {
+    return (
     <div>
       <h1 className="col-span-4 text-center mt-12 text-4xl font-bold tracking-tight" style={{marginBottom: '20px'}}>
         My Classes
@@ -104,6 +114,15 @@ const ClassFolders: React.FC<MyComponentProps> = ({ darkMode }) => {
       </div>
     </div>
   );
-};
+} else {
+  return (
+    <div>
+      <h1 className="col-span-4 text-center mt-12 text-4xl font-bold tracking-tight">
+        No classes found. You can add classes in the appropriate section.
+      </h1>
+    </div>
+  );
+}
+}
 
 export default ClassFolders;

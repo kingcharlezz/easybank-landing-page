@@ -86,10 +86,11 @@ export default function Login() {
         >
           Login with Google
         </button>
-
+        <div className="text-center">
         <Link href="/signup">
-            <span className="text-center underline">Don't have an account? Sign up</span>
+            <span className="pwlink">Don't have an account? Sign up</span>
         </Link>
+        </div>
       </div>
     </div>
   );
