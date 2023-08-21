@@ -29,7 +29,7 @@ if (!admin.apps.length) {
 }
 
 const db = firestore();
-const stripe = new Stripe("sk_test_51NWlFcBvnwuagBF32v2nEfSPedUdPO85zrv6r7qgRHn5GecwtAcEZDQgSTevowiAWk1TDnJjzt9bz5Y3XgTNBpHC00zTwnmGeN", { apiVersion: '2022-11-15' });
+const stripe = new Stripe("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", { apiVersion: '2022-11-15' });
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!req.body) {
     res.status(400).send({ error: 'Invalid request body' });

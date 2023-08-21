@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // Initialize Stripe with your secret key
-const stripe = new Stripe("sk_test_51NWlFcBvnwuagBF32v2nEfSPedUdPO85zrv6r7qgRHn5GecwtAcEZDQgSTevowiAWk1TDnJjzt9bz5Y3XgTNBpHC00zTwnmGeN", { apiVersion: '2022-11-15' });
+const stripe = new Stripe("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", { apiVersion: '2022-11-15' });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {

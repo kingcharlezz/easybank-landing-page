@@ -18,7 +18,7 @@ interface MyComponentProps {
 const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const stripePromise = loadStripe('pk_test_51NWlFcBvnwuagBF3TlXeR13qGtAemDvsU3xGLBntnkyBEWdeW034T9dqRJRBvsRuYq52XYV7fuyrs4D2x4SNRtCy00h71OfFRr');
+  const stripePromise = loadStripe('pk_live_51NWlFcBvnwuagBF39DAb6XZoiMJrlPFpDUj4YQIva26qWTJU1bnoaCq7tcI6iKQ7O9NJWHx1YRw8QJxx5inPQw7M007OzH5hhc');
 
   // Define a mapping of product names to features
   const productFeatures: { [key: string]: string[] } = {
