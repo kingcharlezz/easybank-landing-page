@@ -6,6 +6,23 @@ import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 const db = getFirestore();
 const auth = getAuth();
 
+<style jsx>{`
+  .spinner {
+    border: 5px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`}</style>
+
+
 interface Product {
   name: string;
   price: number;
@@ -18,6 +35,7 @@ interface MyComponentProps {
 const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<Record<string, boolean>>({}); // Add loading state for each product
   const stripePromise = loadStripe('pk_live_51NWlFcBvnwuagBF39DAb6XZoiMJrlPFpDUj4YQIva26qWTJU1bnoaCq7tcI6iKQ7O9NJWHx1YRw8QJxx5inPQw7M007OzH5hhc');
 
   // Define a mapping of product names to features
@@ -58,6 +76,7 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   }, []);
 
   const handleClick = async (priceId: string) => {
+    setLoading({ ...loading, [priceId]: true }); // Set loading to true for the clicked product
     console.log('priceId:', priceId);
   
     // Send request to server to create a new Checkout Session
@@ -81,7 +100,7 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
     }
   
     const { error } = await stripe.redirectToCheckout({ sessionId });
-  
+    setLoading({ ...loading, [priceId]: false }); // Set loading to false after redirecting
     if (error) {
       console.error(error);
     }
@@ -92,7 +111,7 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   
   return (
     <div className="pricing-container">
-       <div className="pricing-card" style={pricingCardStyle}>
+      <div className="pricing-card" style={pricingCardStyle}>
         <h2 className="plan-name">Free Plan</h2>
         <p>$0 per month</p>
         <ul style={{ listStyleType: 'none' }}>
@@ -102,7 +121,7 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
         </ul>
       </div>
       {products.map((product) => (
-         <div className="pricing-card" style={pricingCardStyle} key={product.priceId}>
+        <div className="pricing-card" style={pricingCardStyle} key={product.priceId}>
           <h2 className="plan-name">{product.name}</h2>
           <p>${product.price / 100} per month</p>
           <ul style={{ listStyleType: 'none' }}>
@@ -110,11 +129,14 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
               <li key={index} style={{ textAlign: 'center', fontSize: '1.4em', margin: '10px 0' }}>{feature}</li>
             ))}
           </ul>
-          <button className="subscribe-button" onClick={() => handleClick(product.priceId)}>Subscribe</button>
+          {loading[product.priceId] ? (
+            <div className="spinner"></div> // Render spinner if loading is true for this product
+          ) : (
+            <button className="subscribe-button" onClick={() => handleClick(product.priceId)}>Subscribe</button> // Render button if loading is false for this product
+          )}
         </div>
       ))}
     </div>
-  );  
-};
-
+  );
+}
 export default PricingPage;

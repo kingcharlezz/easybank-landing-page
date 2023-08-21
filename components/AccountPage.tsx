@@ -127,7 +127,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
         <div className={`rounded-lg shadow-lg p-6 text-center ${darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-white text-gray-900'}`}>
           <h2 className="text-4xl font-bold mb-6">Account Details</h2>
           {usageCounts && (
-            <div className="mb-6 text-lg">
+            <div className="mb-6 text-2xl">
               <p>Regular Summary Usage Count : {usageCounts.summary}</p>
               <p>File Summary Usage Count : {usageCounts.fileSummary}</p>
             </div>
@@ -146,31 +146,15 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
                 className={`bg-blue-600 text-white rounded-full hover:bg-blue-700 ${darkMode ? 'shadow-md' : ''}`}
                 style={{ fontSize: '24px', padding: '16px 32px' }}
               >
-                Go to Stripe Portal
+                Manage Subscription
               </button>
             </div>
           </div>
         ) : (
           <div className={`flex justify-center items-center h-60 ${darkMode ? 'bg-darker-blue' : 'bg-white'}`}>
-            <div className={`spinner ${darkMode ? 'text-neutral-white' : 'text-gray-900'}`}></div>
           </div>
         )}
       </div>
-      <style jsx>{`
-        .spinner {
-          border: 5px solid transparent;
-          border-top-color: currentColor;
-          border-radius: 50%;
-          width: 50px;
-          height: 50px;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 };
