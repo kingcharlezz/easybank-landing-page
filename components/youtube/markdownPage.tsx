@@ -11,16 +11,6 @@ const MarkdownPage: React.FC = () => {
   const [markdown, setMarkdown] = useState<string | null>(null);
 
   useEffect(() => {
-    // Set the class of body element based on darkMode state
-    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
-
-    // clean up function to reset style when component unmounts
-    return () => {
-      document.body.className = '';
-    };
-  }, [darkMode]);
-
-  useEffect(() => {
     if (videoId) {
       axios.get(`/api/cached_summary?v=${videoId}`)
         .then(response => {
@@ -38,7 +28,16 @@ const MarkdownPage: React.FC = () => {
   if (!markdown) {
     return <div>Loading markdown...</div>;
   }
+  useEffect(() => {
+    // Set the class of body element based on darkMode state
+    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
 
+    // clean up function to reset style when component unmounts
+    return () => {
+      document.body.className = '';
+    };
+  }, [darkMode]);
+  
   return (
     <div className="w-full min-h-screen">
       <div className="prose prose-lg max-w-full mx-auto my-12">

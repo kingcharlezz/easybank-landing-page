@@ -118,7 +118,7 @@ const ClassFolders: React.FC<MyComponentProps> = ({ darkMode }) => {
   return (
     <div>
       <h1 className="col-span-4 text-center mt-12 text-4xl font-bold tracking-tight">
-        No classes found. You can add classes in the appropriate section.
+        No classes found. You can add videos to classes by filling out the "Class" box in the note-taking section.
       </h1>
     </div>
   );

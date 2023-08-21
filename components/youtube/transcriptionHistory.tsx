@@ -33,10 +33,16 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
         }
     };
     // test
-
     useEffect(() => {
-        document.body.className = darkMode ? 'body-dark' : 'body-light';
+        // Set the class of body element based on darkMode state
+        document.body.className = darkMode ? 'dark-mode' : 'light-mode';
     
+        // clean up function to reset style when component unmounts
+        return () => {
+          document.body.className = '';
+        };
+      }, [darkMode]);
+    useEffect(() => {
         const auth = getAuth();
         const user: User | null = auth.currentUser;
         

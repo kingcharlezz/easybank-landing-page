@@ -89,7 +89,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
 
   useEffect(() => {
     fetchApiUsageCounts();
-    document.body.className = darkMode ? 'body-dark' : 'body-light';
+
     const user: User | null = auth.currentUser;
 
     if (user) {
@@ -110,6 +110,16 @@ const AccountPage: React.FC<AccountPageProps> = ({ darkMode }) => {
     } else {
       console.log("No user is signed in.");
     }
+  }, [darkMode]);
+  
+  useEffect(() => {
+    // Set the class of body element based on darkMode state
+    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
+
+    // clean up function to reset style when component unmounts
+    return () => {
+      document.body.className = '';
+    };
   }, [darkMode]);
 
   return (
