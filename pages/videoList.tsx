@@ -29,7 +29,7 @@ const UserVideo: React.FC<MyComponentProps> = ({ darkMode }) => {
   };
 
   useEffect(() => {
-    document.body.className = darkMode ? 'body-dark' : 'body-light';
+    
     const auth = getAuth();
     const user = auth.currentUser;
 
