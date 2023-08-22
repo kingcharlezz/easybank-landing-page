@@ -3,18 +3,18 @@ import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWith
 import { auth } from '../components/layout/firebase';
 import Link from 'next/link';
 import Navbar from '../components/layout/Navbar';
-
+import { useRouter } from 'next/router'; // Import the useRouter hook
 // Initialize a Google Auth Provider
 const provider = new GoogleAuthProvider();
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const router = useRouter(); // Use the useRouter hook
   const signUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      alert('User registered successfully!');
+      router.push('/dashboard');
     } catch (error: any) {
       alert(error.message);
     }
@@ -23,7 +23,7 @@ export default function Signup() {
   const googleSignUp = async () => {
     try {
       await signInWithPopup(auth, provider);
-      alert('Registered successfully with Google!');
+      router.push('/dashboard');
     } catch (error: any) {
       alert(error.message);
     }

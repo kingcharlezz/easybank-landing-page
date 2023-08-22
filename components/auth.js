@@ -36,7 +36,6 @@ const Auth = () => {
       const uid = userCredential.user.uid;
       // Create a document in Firestore with the user's uid
       await setDoc(doc(db, 'users', uid), { email: email });
-      alert('User registered successfully!');
     } catch (error) {
       alert(error.message);
     }
@@ -45,7 +44,7 @@ const Auth = () => {
   const logIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert('Logged in successfully!');
+      window.location.href = "https://www.notescribe.ai/dashboard";
     } catch (error) {
       alert(error.message);
     }
