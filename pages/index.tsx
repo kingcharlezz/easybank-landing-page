@@ -11,7 +11,7 @@ const Home: NextPage = () => {
   }, []);
 
   return (
-    <>
+    <div className="lg:container lg:mx-auto">
       <Head>
         <title>NoteScribe</title>
         <link rel="icon" href="/favicon-32x32.png" />
@@ -24,7 +24,7 @@ const Home: NextPage = () => {
         <Hero />
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
