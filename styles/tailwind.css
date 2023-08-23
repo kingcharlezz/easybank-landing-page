@@ -623,14 +623,15 @@ select {
 	--tw-backdrop-sepia: ;
 }
 
-.container {
-  width: 100%;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 1.25rem;
-  padding-left: 1.25rem;
+@media (width >= 500px) {
+	.container {
+		width: 100%;
+  	margin-right: auto;
+  	margin-left: auto;
+  	padding-right: 1.25rem;
+  	padding-left: 1.25rem;
 }
-
+}
 @media (width <= 1279px) {
 	.container {
 		max-width: 1024px;
