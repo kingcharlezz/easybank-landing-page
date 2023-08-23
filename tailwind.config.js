@@ -9,9 +9,6 @@ module.exports = {
   ],
   darkMode: false, 
   theme: {
-    screens: { // Override the default breakpoints with a single one
-      'desktop': '0px',
-    },
     extend: {
       fontFamily: {
         sans: ['Public Sans', ...defaultTheme.fontFamily.sans],
