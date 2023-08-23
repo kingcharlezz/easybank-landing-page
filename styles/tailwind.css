@@ -661,7 +661,7 @@ select {
 	}
 }
 
-@media (width >= 1536px) {
+@media (width >= 1281px) {
 	.container {
 		max-width: 1536px;
 		padding-right: 5rem;
