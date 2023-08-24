@@ -623,37 +623,37 @@ select {
 	--tw-backdrop-sepia: ;
 }
 
-@media (width >= 640px) {
+@media (min-width: 640px) {
 	.container {
-		max-width: 640px;
-		padding-right: 2rem;
-		padding-left: 2rem;
+	  max-width: 640px;
+	  padding-right: 2rem;
+	  padding-left: 2rem;
 	}
-}
-
-@media (width >= 1024px) {
+  }
+  
+  @media (min-width: 1024px) {
 	.container {
-		max-width: 1024px;
-		padding-right: 3rem;
-		padding-left: 3rem;
+	  max-width: 1024px;
+	  padding-right: 3rem;
+	  padding-left: 3rem;
 	}
-}
-
-@media (width >= 1280px) {
+  }
+  
+  @media (min-width: 1280px) {
 	.container {
-		max-width: 1280px;
-		padding-right: 4rem;
-		padding-left: 4rem;
+	  max-width: 1280px;
+	  padding-right: 4rem;
+	  padding-left: 4rem;
 	}
-}
-
-@media (width >= 1536px) {
+  }
+  
+  @media (min-width: 1536px) {
 	.container {
-		max-width: 1536px;
-		padding-right: 5rem;
-		padding-left: 5rem;
+	  max-width: 1536px;
+	  padding-right: 5rem;
+	  padding-left: 5rem;
 	}
-}
+  }  
 
 .aspect-w-1,
 .aspect-w-2,
@@ -1936,7 +1936,7 @@ select {
   transition-duration: 200ms;
 }
 
-@media (width >= 1024px) {
+@media (min-width: 1024px) {
 	.lg\:aspect-w-4 {
 		position: relative;
 		padding-bottom: calc(var(--tw-aspect-h) / var(--tw-aspect-w) * 100%);
@@ -2043,7 +2043,7 @@ select {
   opacity: 0.8;
 }
 
-@media (width >= 640px) {
+@media (min-width: 640px) {
 	.sm\:mt-10 {
 		margin-top: 2.5rem;
 	}
@@ -2072,13 +2072,13 @@ select {
   }
 }
 
-@media (width >= 768px) {
+@media (min-width:  768px) {
 	.md\:-top-16 {
 		top: -4rem;
 	}
 }
 
-@media (width >= 1024px) {
+@media (min-width:  1024px) {
 	.lg\:col-span-3 {
 		grid-column: span 3 / span 3;
 	}
@@ -2271,7 +2271,7 @@ select {
   }
 }
 
-@media (width >= 1280px) {
+@media (min-width:  1280px) {
 	.xl\:-right-28 {
 		right: -7rem;
 	}
