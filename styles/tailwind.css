@@ -2042,6 +2042,12 @@ select {
 .disabled\:opacity-80:disabled {
   opacity: 0.8;
 }
+
+@media (width >= 640px) {
+	.sm\:mt-10 {
+		margin-top: 2.5rem;
+	}
+
   .sm\:py-32 {
     padding-top: 8rem;
     padding-bottom: 8rem;
@@ -2064,7 +2070,13 @@ select {
   .sm\:leading-6 {
     line-height: 1.5rem;
   }
+}
 
+@media (width >= 768px) {
+	.md\:-top-16 {
+		top: -4rem;
+	}
+}
 
 @media (width >= 769px) {
 	.lg\:col-span-3 {
