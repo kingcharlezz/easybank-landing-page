@@ -2092,7 +2092,7 @@ select {
 	}
 }
 
-@media (width >= 769px) {
+@media (width >= 1024px) {
 	.lg\:col-span-3 {
 		grid-column: span 3 / span 3;
 	}
