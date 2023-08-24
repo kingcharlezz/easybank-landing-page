@@ -2855,8 +2855,3 @@ body, html {
 	cursor: pointer !important;
   }
   
-  .desktop-view {
-	width: 1280px; /* Typical desktop width, but you can adjust as needed */
-	margin: 0 auto; /* Center the content */
-	overflow-x: auto; /* Enable horizontal scrolling if the screen is smaller than the fixed width */
-  }
