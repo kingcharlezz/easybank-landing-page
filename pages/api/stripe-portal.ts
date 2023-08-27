@@ -26,7 +26,7 @@ if (!admin.apps.length) {
       databaseURL: 'https://notescribe-6867a.firebaseio.com'
     });
   }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2022-11-15' });
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -50,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const session = await stripe.billingPortal.sessions.create({
     customer: stripeCustomerId,
-    return_url: `${req.headers.origin}/account`,
+    return_url: `${req.headers.origin}/dashboard`,
+
   });
 
   res.send({ url: session.url });

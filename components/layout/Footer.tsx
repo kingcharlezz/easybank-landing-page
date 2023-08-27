@@ -21,13 +21,13 @@ export default function Footer() {
           </div>
 
           <div className="grid grid-cols-1 gap-2 py-1 lg:grid-rows-3 text-white lg:text-left lg:justify-self-start lg:col-span-5 lg:gap-x-24 lg:grid-flow-col-dense">
-            <a className="hover:text-green-400" href="#">
+            <a className="hover:text-green-400" href="mailto:charlie@notescribe.ai">
               Contact
             </a>
-            <a className="hover:text-green-400" href="#">
+            <a className="hover:text-green-400" href="mailto:support@notescribe.ai">
               Support
             </a>
-            <a className="hover:text-green-400" href="#">
+            <a className="hover:text-green-400" href="/privacy-policy.pdf" download>
               Privacy Policy
             </a>
           </div>
