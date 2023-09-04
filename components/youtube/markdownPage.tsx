@@ -28,15 +28,6 @@ const MarkdownPage: React.FC = () => {
   if (!markdown) {
     return <div>Loading markdown...</div>;
   }
-  useEffect(() => {
-    // Set the class of body element based on darkMode state
-    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
-
-    // clean up function to reset style when component unmounts
-    return () => {
-      document.body.className = '';
-    };
-  }, [darkMode]);
   
   return (
     <div className="w-full min-h-screen">

@@ -11,10 +11,22 @@ interface Product {
   priceId: string;
 }
 
-const PricingPage: FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const stripePromise = loadStripe('pk_live_51NWlFcBvnwuagBF39DAb6XZoiMJrlPFpDUj4YQIva26qWTJU1bnoaCq7tcI6iKQ7O9NJWHx1YRw8QJxx5inPQw7M007OzH5hhc');
+  
 
+const PricingPage: FC = () => {
+  const [products, setProducts] = useState<Product[]>([
+    {
+      name: 'Premium Plan',
+      price: 999,
+      priceId: 'premium-plan-id',
+    },
+    {
+      name: 'PremiumPlus Plan',
+      price: 1999,
+      priceId: 'premiumplus-plan-id',
+    },
+    // Add more plans as needed
+  ]);
   // Define a mapping of product names to features
   const productFeatures: { [key: string]: string[] } = {
     'Free Plan': ['10 Youtube Videos Notes Per Month', '3 Uploaded Files Notes Per Month', 'No Access to AI Humanizer(Coming Soon)'],

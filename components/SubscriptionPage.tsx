@@ -33,7 +33,20 @@ interface MyComponentProps {
 }
 
 const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([
+    {
+      name: 'Premium Plan',
+      price: 999,
+      priceId: 'premium-plan-id',
+    },
+    {
+      name: 'PremiumPlus Plan',
+      price: 1999,
+      priceId: 'premiumplus-plan-id',
+    },
+    // Add more plans as needed
+  ]);
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<Record<string, boolean>>({}); // Add loading state for each product
   const stripePromise = loadStripe('pk_live_51NWlFcBvnwuagBF39DAb6XZoiMJrlPFpDUj4YQIva26qWTJU1bnoaCq7tcI6iKQ7O9NJWHx1YRw8QJxx5inPQw7M007OzH5hhc');
@@ -49,27 +62,6 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   useEffect(() => {
     // Firebase auth state observer
     const unsubscribe = onAuthStateChanged(auth, setUser);
-
-    const fetchProducts = async () => {
-      const productQuerySnapshot = await getDocs(query(collection(db, 'products'), where('active', '==', true)));
-      const products: Product[] = [];
-      for (const doc of productQuerySnapshot.docs) {
-        const productData = doc.data();
-        const priceQuerySnapshot = await getDocs(collection(doc.ref, 'prices'));
-        for (const priceDoc of priceQuerySnapshot.docs) {
-          const priceData = priceDoc.data();
-          products.push({
-            name: productData.name,
-            price: priceData.unit_amount,
-            priceId: priceDoc.id,
-          } as Product);
-        }
-      }
-      setProducts(products);
-    };
-
-    fetchProducts();
-
 
     // Clean up subscription
     return () => unsubscribe();
