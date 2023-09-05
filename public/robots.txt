@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /api/
+Allow: /dashboard/
+
+# Pointing to the sitemap
+Sitemap: https://www.notescribe.ai/sitemap.xml

@@ -15,6 +15,8 @@ const Home: NextPage = () => {
       <Head>
         <title>NoteScribe</title>
         <link rel="icon" href="/favicon-32x32.png" />
+        <link rel="canonical" href="https://notescribe.ai/" />
+        <meta name="description" content="Discover NoteScribe, an AI-powered platform that revolutionizes learning by converting uploaded files and YouTube videos into comprehensive notes, making the need to physically attend classes a thing of the past. With NoteScribe, students can enjoy an enriched, flexible learning journey right from the comfort of their home, breaking away from traditional classroom constraints" />
       </Head>
       <Navbar />
       <div className="relative overflow-hidden">
