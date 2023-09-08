@@ -15,6 +15,21 @@ interface DashboardProps {
   children?: ReactNode;
 }
 
+const isMobile = () => {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
+  ];
+
+  return toMatch.some((toMatchItem) => {
+    return navigator.userAgent.match(toMatchItem);
+  });
+};
+
 export default function Dashboard({ children }: DashboardProps) {
   const [view, setView] = useState<string[]>(['noteTaking', 'overview']);
   const [isNoteTakingExpanded, setIsNoteTakingExpanded] = useState(false);
@@ -25,6 +40,11 @@ export default function Dashboard({ children }: DashboardProps) {
   const [accessCounts, setAccessCounts] = useState<{[key: string]: number}>({});
   const db = getFirestore();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isMobileDevice, setIsMobileDevice] = useState<boolean>(false);  // New state to manage mobile devices
+
+  useEffect(() => {
+    setIsMobileDevice(isMobile());  // Using the isMobile function to set the state
+  }, []);
 
   // Redirect if user is not defined
   useEffect(() => {
@@ -121,6 +141,19 @@ export default function Dashboard({ children }: DashboardProps) {
     };
   }, [darkMode]);
   
+  if (isMobileDevice) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+        <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
+          Mobile device use not yet supported
+        </div>
+        <div style={{ marginTop: '20px' }}>
+          Please try our website on a laptop or desktop at <a href="https://notescribe.ai">https://notescribe.ai</a>
+        </div>
+      </div>
+    );
+  }
+  else
   return (
     <div className={`${
       darkMode ? 'bg-dark-blue text-neutral-white' : 'bg-neutral-very-light-gray text-primary-black'
