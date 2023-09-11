@@ -143,12 +143,12 @@ export default function Dashboard({ children }: DashboardProps) {
   
   if (isMobileDevice) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', backgroundColor: 'black' }}>
+        <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
           Mobile device use not yet supported
         </div>
-        <div style={{ marginTop: '20px' }}>
-          Please try our website on a laptop or desktop at <a href="https://notescribe.ai">https://notescribe.ai</a>
+        <div style={{ marginTop: '20px', color: 'white' }}>
+          Please try our website on a laptop or desktop at <a href="https://notescribe.ai" style={{ color: 'white' }}>https://notescribe.ai</a>
         </div>
       </div>
     );
