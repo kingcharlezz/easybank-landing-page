@@ -37,12 +37,12 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
     {
       name: 'Premium Plan',
       price: 500,
-      priceId: 'premium-plan-id',
+      priceId: 'price_1NhLGpBvnwuagBF3xx2ahf2c',
     },
     {
       name: 'PremiumPlus Plan',
       price: 1000,
-      priceId: 'premiumplus-plan-id',
+      priceId: 'price_1NhLGlBvnwuagBF3i32XHWs4',
     },
     // Add more plans as needed
   ]);
