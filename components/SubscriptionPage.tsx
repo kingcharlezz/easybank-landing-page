@@ -36,12 +36,12 @@ const PricingPage: React.FC<MyComponentProps> = ({ darkMode }) => {
   const [products, setProducts] = useState<Product[]>([
     {
       name: 'Premium Plan',
-      price: 999,
+      price: 500,
       priceId: 'premium-plan-id',
     },
     {
       name: 'PremiumPlus Plan',
-      price: 1999,
+      price: 1000,
       priceId: 'premiumplus-plan-id',
     },
     // Add more plans as needed
