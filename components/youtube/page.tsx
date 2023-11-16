@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from 'uuid';
 import React from "react";
 const auth = getAuth();
 const db = getFirestore();
+import { Dna } from  'react-loader-spinner'
 
 
 type PaymentTierType = "Premium" | "PremiumPlus";
@@ -151,8 +152,7 @@ export default function Example({ darkMode }: ExampleProps) {
   const summaryRestriction = useRouteRestriction('summary');
   const fileSummaryRestriction = useRouteRestriction('fileSummary');
   const [videoName, setVideoName] = useState("")
-  
-
+  const [spinner, setSpinner] = useState(false);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
   const [ts, setTs] = useState(0);
@@ -270,8 +270,9 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
   setSummary("");
   setLoading(true);
   setUrl(currentUrl);
+  setSpinner(true);
   const videoId = extractVideoId(currentUrl);
-
+try {
   try {
     const className = classRef.current?.value;  // Make sure to create this ref
     try {
@@ -367,7 +368,12 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
     done = doneReading;
     const chunkValue = decoder.decode(value);
     localSummary += chunkValue;
-    setSummary((prev) => prev + chunkValue);
+    setSummary((prev) => {
+      if (prev === "") {
+        setSpinner(false); // Stop loading when text output begins
+      }
+      return prev + chunkValue;
+    });
   }
 /*
   if (videoId) {
@@ -389,7 +395,14 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
   console.log("Summary completed!", summary);
 
   incrementCounter('summary'); // Add this line
+} catch (err) {
+  // This catch block will handle any errors that occur in the try block
+  console.error("An error occurred during file summary generation:", err);
+  toast.error("An error occurred while processing your file. Please try again.");
+  setSpinner(false); // Stop loading when an error occurs
+}
 };
+
 
   const generateFileSummary = async (e: any, overLimit: boolean, loading: boolean, checkingApiUsage: boolean) => {
   e.preventDefault();
@@ -414,7 +427,7 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
       return;
     }
   
-    const validTypes = ['audio/mp3', 'audio/mp4', 'audio/mpeg', 'audio/mpga', 'audio/m4a', 'audio/wav', 'audio/webm'];
+    const validTypes = ['audio/mp3', 'video/mp4', 'audio/mpeg', 'audio/mpga', 'audio/m4a', 'audio/wav', 'audio/webm'];
     if (!validTypes.includes(currentFile.type)) {
       toast.error("Invalid file type. Please upload a valid audio/video file.");
       return;
@@ -425,6 +438,7 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
     setStart(true);
     setSummary("");
     setLoading(true);
+    setSpinner(true);
   
     const formData = new FormData();
     formData.append("model", "tiny");
@@ -517,7 +531,12 @@ const generateSummary = async (e: any, overLimit: boolean, loading: boolean, che
         try {
           const json = JSON.parse(data);
           const text = json.text;
-          setSummary((prev) => prev + text);
+          setSummary((prev) => {
+            if (prev === "") {
+              setSpinner(false); // Stop loading when text output begins
+            }
+            return prev + text;
+          });
         } catch (e) {
           console.log({ e });
         }
@@ -735,7 +754,35 @@ const SummaryRenderer = React.memo(({ summary }: SummaryRendererProps) => (
                     className={`block w-full rounded-md border-0 py-1.5 ${darkMode ? 'text-gray-900' : 'text-gray-900'} shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 lg:text-base`}
                     placeholder="https://www.youtube.com/watch?v=1234567890"
                   />
-                </div>
+                  {spinner && (
+                    <div 
+                        style={{ 
+                            position: 'fixed', 
+                            inset: 0, 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            zIndex: 50, 
+                        }}
+                    >
+                        <div className="bg-transparent p-5 rounded-lg flex items-center flex-col">
+                            <Dna
+                                visible={true}
+                                height="80"
+                                width="80"
+                                ariaLabel="dna-loading"
+                                wrapperStyle={{}}
+                                wrapperClass="dna-wrapper"
+                            />
+                              <span 
+                                  className="text-lg font-medium mt-3"
+                                  style={{ textShadow: '2px 2px 2px rgba(0, 0, 0, 1)' }}>
+                                  Processing... Please allow time <br/> for the video to be sent and transcribed
+                              </span>                        
+                              </div>
+                    </div>
+                )}
+              </div>
                 <div className="relative">
                   <label htmlFor="file" className={`absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium ${darkMode ? 'text-gray-900' : 'text-gray-900'}`}>
                     Upload File
@@ -789,14 +836,14 @@ const SummaryRenderer = React.memo(({ summary }: SummaryRendererProps) => (
                 />
               </div>
               </div>
-                <button
-                  onClick={handleProcessing}
-                  disabled={loading}
-                  type="button"
-                  className={`rounded-md bg-blue-600 py-2 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-opacity-50 focus:outline-none disabled:opacity-80 goButton ${darkMode ? 'text-neutral-white' : 'text-primary-black'}`}
+               <button
+                onClick={handleProcessing}
+                disabled={loading || spinner} // Disable button when loading or spinner is active
+                type="button"
+                className={`rounded-md bg-blue-600 py-2 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-opacity-50 focus:outline-none disabled:opacity-80 goButton ${darkMode ? 'text-neutral-white' : 'text-primary-black'}`}
                 >
-                  Go!
-                </button>
+                Go!
+              </button>
               </div>
             </div>
           </div>
